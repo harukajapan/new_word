@@ -1,0 +1,3056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Textbook Flashcard / 日本語教科書フラッシュカード</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FAF6EE;
+            --card: #FFFFFF;
+            --accent: #C9A876;
+            --accent-dark: #8B6F47;
+            --accent-soft: #EFE4D0;
+            --line: #D9C9AC;
+            --text: #2E2418;
+            --text-muted: #7A6A55;
+            --ok: #6B9B7F;
+            --ok-soft: #E6F3EC;
+            --wrong: #C44A4A;
+            --wrong-soft: #FDEAEA;
+            --fs-title: 2.4rem;
+            --fs-section: 1.2rem;
+            --fs-body: 1rem;
+            --fs-en: 0.92rem;
+            --fs-small: 0.82rem;
+            --radius-lg: 20px;
+            --radius: 12px;
+            --pad: 1.75rem;
+            --gap: 1.1rem;
+            --shadow: 0 4px 24px rgba(139, 111, 71, 0.08);
+            --font-jp: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+            --font-body: 'Noto Sans JP', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body { padding: 2rem 1rem; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        .page { max-width: 920px; margin: 0 auto; }
+
+        /* Header */
+        .header { background: var(--card); border-radius: var(--radius-lg); padding: 2.5rem var(--pad); box-shadow: var(--shadow); margin-bottom: var(--gap); position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: var(--accent-soft); border-radius: 50%; opacity: 0.6; }
+        .header-inner { position: relative; z-index: 1; }
+        .header h1 { font-family: var(--font-jp); font-size: var(--fs-title); font-weight: 900; color: var(--accent-dark); margin: 0 0 0.5rem; line-height: 1.2; }
+        .header-subtitle { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
+        .header-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        .stat-chip { background: var(--accent-soft); color: var(--accent-dark); font-size: var(--fs-small); font-weight: 700; padding: 0.5rem 1rem; border-radius: 999px; }
+        .stat-chip .label { display: block; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .stat-chip .value { font-size: 1.4rem; font-weight: 900; color: var(--accent-dark); }
+
+        /* Navigation */
+        .nav { background: var(--card); border-radius: var(--radius-lg); padding: 0; box-shadow: var(--shadow); margin-bottom: var(--gap); display: flex; flex-wrap: wrap; }
+        .nav button { flex: 1; min-width: 100px; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-family: var(--font-jp); font-size: 0.95rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; }
+        .nav button:hover { color: var(--accent-dark); }
+        .nav button.active { color: var(--accent-dark); border-bottom-color: var(--accent); background: var(--accent-soft); }
+
+        /* View */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* Textbook Structure */
+        .textbook-section { margin-bottom: 2.5rem; }
+        .section-title { font-family: var(--font-jp); font-size: 1.4rem; font-weight: 900; color: var(--accent-dark); margin: 0 0 1.5rem; padding-bottom: 1rem; border-bottom: 3px solid var(--accent); }
+        .section-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+        .chapter-card { background: var(--card); border: 2px solid var(--line); border-radius: var(--radius-lg); padding: 1.5rem; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow); }
+        .chapter-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 28px rgba(139, 111, 71, 0.12); }
+        .chapter-card.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .chapter-title { font-family: var(--font-jp); font-weight: 700; margin-bottom: 0.7rem; font-size: 1rem; }
+        .chapter-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+        .chapter-progress { width: 100%; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 0.7rem; }
+        .chapter-progress-bar { height: 100%; background: var(--ok); transition: width 0.3s ease; }
+        .chapter-stats { font-size: 0.8rem; color: var(--text-muted); }
+        .chapter-card.active .chapter-stats { color: rgba(255, 255, 255, 0.9); }
+        .chapter-card.active .chapter-subtitle { color: rgba(255, 255, 255, 0.9); }
+
+        /* Study Mode */
+        .study-header { background: var(--card); border-radius: var(--radius-lg); padding: var(--pad); box-shadow: var(--shadow); margin-bottom: var(--gap); display: flex; gap: 0.7rem; flex-wrap: wrap; }
+        .study-header button { flex: 1; min-width: 120px; padding: 0.7rem 1.2rem; border: 1.5px solid var(--line); background: #fff; border-radius: var(--radius); color: var(--accent-dark); font-family: var(--font-jp); font-size: var(--fs-small); font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .study-header button:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+        /* Flashcard */
+        .flashcard-container { background: var(--card); border-radius: var(--radius-lg); padding: 3rem var(--pad); min-height: 350px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; cursor: pointer; margin-bottom: var(--gap); transition: all 0.3s ease; user-select: none; position: relative; }
+        .flashcard-container:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(139, 111, 71, 0.15); }
+        .flashcard-container.flipped { background: var(--highlight: #FFF4E0); }
+        .card-badge { position: absolute; top: 1.2rem; right: 1.5rem; padding: 0.4rem 0.9rem; border-radius: 999px; font-size: var(--fs-small); font-weight: 700; }
+        .badge-new { background: var(--line); color: var(--text); }
+        .badge-learning { background: var(--accent); color: #fff; }
+        .badge-mastered { background: var(--ok); color: #fff; }
+        .badge-burned { background: var(--accent-soft); color: var(--accent-dark); border: 2px solid var(--accent); }
+        .card-label { font-size: var(--fs-small); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.8rem; font-weight: 600; }
+        .card-jp { font-family: var(--font-jp); font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; color: var(--accent-dark); }
+        .card-en { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-muted); font-style: italic; margin: 0.5rem 0; line-height: 1.6; display: none; }
+        .card-romaji { font-size: 2rem; color: var(--text-muted); margin: 0.5rem 0; }
+        .card-content { opacity: 1; transform: scale(1); transition: opacity 0.3s ease; pointer-events: auto; }
+        .card-content#card-back { opacity: 0; display: none; transition: opacity 0.3s ease 0.2s, max-height 0.3s ease; max-height: 0; }
+        .card-content#card-back.active { opacity: 1; display: block; max-height: 500px; }
+
+        /* Controls */
+        .controls { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; margin-bottom: var(--gap); }
+        .btn { padding: 0.7rem 1.3rem; border: none; border-radius: var(--radius); cursor: pointer; font-family: var(--font-jp); font-size: 0.95rem; font-weight: 600; transition: all 0.2s ease; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2); }
+        .btn-success { background: var(--ok); color: #fff; }
+        .btn-success:hover { background: #5a8a70; }
+        .btn-warning { background: #D2A679; color: #fff; }
+        .btn-warning:hover { background: #B8905C; }
+        .btn-secondary { background: var(--line); color: var(--text); }
+        .btn-secondary:hover { background: var(--accent-soft); }
+
+        /* Progress */
+        .progress-box { background: var(--card); border-radius: var(--radius-lg); padding: var(--pad); box-shadow: var(--shadow); margin-bottom: var(--gap); }
+        .progress-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .progress-row:last-child { margin-bottom: 0; }
+        .progress-label { font-family: var(--font-jp); font-weight: 700; min-width: 120px; color: var(--accent-dark); }
+        .progress-bar { flex: 1; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--ok); transition: width 0.3s ease; }
+        .progress-value { font-weight: 700; color: var(--accent-dark); min-width: 50px; text-align: right; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: var(--gap); }
+        .stat-card { background: var(--card); border-radius: var(--radius-lg); padding: 1.3rem; text-align: center; box-shadow: var(--shadow); }
+        .stat-card-value { font-family: var(--font-jp); font-size: 2rem; font-weight: 900; color: var(--accent); margin-bottom: 0.3rem; }
+        .stat-card-label { font-family: var(--font-jp); font-size: var(--fs-small); color: var(--text-muted); font-weight: 600; }
+
+        /* Translation toggle */
+        .trans-toggle { background: var(--card); border-radius: var(--radius-lg); padding: var(--pad); box-shadow: var(--shadow); margin-bottom: var(--gap); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .trans-toggle label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-family: var(--font-jp); font-weight: 600; color: var(--accent-dark); }
+        .trans-toggle input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+        /* Settings */
+        .settings-box { background: var(--card); border-radius: var(--radius-lg); padding: var(--pad); box-shadow: var(--shadow); }
+        .settings-box h3 { font-family: var(--font-jp); font-size: var(--fs-section); color: var(--accent-dark); margin: 0 0 1rem; padding-bottom: 0.7rem; border-bottom: 2px dashed var(--line); }
+        .settings-item { margin-bottom: 1rem; }
+        .settings-item label { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; font-family: var(--font-jp); font-weight: 600; color: var(--text); }
+        .settings-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+        .subsection-group { margin-left: 1.5rem; margin-bottom: 1.5rem; }
+        .subsection-title { font-family: var(--font-jp); font-size: 1rem; font-weight: 700; color: var(--accent-dark); margin-bottom: 0.7rem; padding-left: 0.7rem; border-left: 3px solid var(--accent); }
+
+        @media (max-width: 600px) {
+            body { padding: 1.2rem 0.8rem; }
+            .header { padding: 1.8rem var(--pad); }
+            .header h1 { font-size: 1.8rem; }
+            .section-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+            .flashcard-container { padding: 2rem 1rem; min-height: 280px; }
+            .card-jp { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-inner">
+                <h1>📔 Japanese Textbook</h1>
+                <p class="header-subtitle">日本語教科書 フラッシュカード</p>
+                <div class="header-stats">
+                    <div class="stat-chip">
+                        <span class="label">🔥 Streak / ストリーク</span>
+                        <span class="value" id="streak-display">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="label">⭐ XP</span>
+                        <span class="value" id="xp-display">0</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="label">📚 Cards / カード</span>
+                        <span class="value" id="total-cards-display">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Translation Toggle -->
+        <div class="trans-toggle">
+            <label>
+                <input type="checkbox" id="show-en-toggle" checked>
+                <span>Show English / 英語を表示</span>
+            </label>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" data-view="home">📚 Textbook / 教科書</button>
+            <button class="nav-btn" data-view="study">🎴 Study / 学習</button>
+            <button class="nav-btn" data-view="stats">📊 Stats / 統計</button>
+            <button class="nav-btn" data-view="settings">⚙️ Settings / 設定</button>
+        </div>
+
+        <!-- Home View -->
+        <div id="home" class="view active">
+            <!-- Super Beginner Section -->
+            <div class="textbook-section">
+                <div class="section-title">🔰 Super Beginner / スーパービギナー</div>
+
+                <!-- STEP1 -->
+                <div class="subsection-group">
+                    <div class="subsection-title">【STEP1】Hiragana & Katakana / ひらがな・カタカナ</div>
+                    <div class="section-grid" id="superbegin-step1"></div>
+                </div>
+
+                <!-- STEP2 -->
+                <div class="subsection-group">
+                    <div class="subsection-title">【STEP2】Elementary / 基礎</div>
+                    <div class="section-grid" id="superbegin-step2"></div>
+                </div>
+            </div>
+
+            <!-- Beginner Section (Ch.1-12) -->
+            <div class="textbook-section">
+                <div class="section-title">📖 Beginner / ビギナー (Ch.1-12)</div>
+                <div class="section-grid" id="beginner-chapters"></div>
+            </div>
+
+            <!-- Intermediate Section (Ch.13-23) -->
+            <div class="textbook-section">
+                <div class="section-title">🎯 Intermediate / 中級 (Ch.13-23)</div>
+                <div class="section-grid" id="intermediate-chapters"></div>
+            </div>
+        </div>
+
+        <!-- Study View -->
+        <div id="study" class="view">
+            <div class="study-header">
+                <button id="back-btn">← Back / もどる</button>
+                <button id="mode-toggle">Mode: Flashcard / フラッシュカード</button>
+                <button id="direction-toggle">Direction / 方向: JP→EN</button>
+            </div>
+
+            <div class="flashcard-container" id="flashcard">
+                <div class="card-badge" id="card-badge"></div>
+                <!-- Front: Always visible -->
+                <div class="card-content active" id="card-front" style="width: 100%;">
+                    <div class="card-label" id="card-label-front">Front / 表</div>
+                    <div class="card-jp" id="card-jp-front">Click to start / クリックして開始</div>
+                    <div class="card-romaji" id="card-romaji-front"></div>
+                    <div class="card-en" id="card-en-front"></div>
+                </div>
+                <!-- Back: Shown below after flip -->
+                <div class="card-content" id="card-back" style="width: 100%; margin-top: 2rem; border-top: 2px solid var(--accent-soft); padding-top: 1.5rem;">
+                    <div class="card-label" id="card-label-back">Back / 裏</div>
+                    <div class="card-jp" id="card-jp-back" style="font-size: 1.8rem;"></div>
+                    <div class="card-romaji" id="card-romaji-back"></div>
+                    <div class="card-en" id="card-en-back"></div>
+                </div>
+            </div>
+
+            <div class="controls" id="flashcard-controls">
+                <button class="btn btn-warning" id="btn-again">Again / もう一度</button>
+                <button class="btn btn-warning" id="btn-hard">Hard / 難しい</button>
+                <button class="btn btn-success" id="btn-good">Good / 良い</button>
+                <button class="btn btn-primary" id="btn-easy">Easy / 簡単</button>
+            </div>
+
+            <!-- Card Context Menu -->
+            <div id="card-menu" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+                <div style="background: var(--card); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow); max-width: 280px; width: 90%;">
+                    <div style="font-family: var(--font-jp); font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; color: var(--accent-dark);">選択してください</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                        <button class="btn btn-warning" id="menu-again" style="width: 100%;">Again / もう一度</button>
+                        <button class="btn btn-warning" id="menu-hard" style="width: 100%;">Hard / 難しい</button>
+                        <button class="btn btn-success" id="menu-easy" style="width: 100%;">Easy / 簡単</button>
+                        <button class="btn btn-secondary" id="menu-close" style="width: 100%;">キャンセル</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-section" style="display: none;">
+                <!-- Question Always Visible -->
+                <div class="flashcard-container">
+                    <div class="card-label">Question / 問題</div>
+                    <div class="card-jp" id="quiz-question">Loading...</div>
+                    <div class="card-en" id="quiz-en"></div>
+                </div>
+
+                <!-- Choices Grid -->
+                <div style="margin: 1.5rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;" id="quiz-choices"></div>
+
+                <!-- Feedback (shown after answer) -->
+                <div class="progress-box" id="quiz-feedback" style="display: none; text-align: center; margin-top: 1.5rem;">
+                    <div id="feedback-text" style="font-family: var(--font-jp); font-size: 1.5rem; font-weight: 700; color: var(--ok); margin-bottom: 1rem;">✓ Correct! / 正解</div>
+                    <button class="btn btn-primary" id="btn-next-quiz">Next / 次へ</button>
+                </div>
+            </div>
+
+            <div class="progress-box">
+                <div class="progress-row">
+                    <div class="progress-label">Progress / 進捗</div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="session-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-value" id="session-progress-text">0%</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: var(--gap);">
+                <small id="card-counter" style="color: var(--text-muted);">Card 1 / カード 1 of 10</small>
+            </div>
+        </div>
+
+        <!-- Completion View -->
+        <div id="completion" class="view" style="padding: 2rem;">
+            <div style="text-align: center; background: var(--card); border-radius: var(--radius-lg); padding: 3rem 2rem; box-shadow: var(--shadow); max-width: 600px; margin: 0 auto;">
+                <!-- Celebration -->
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+
+                <!-- Title -->
+                <h2 style="font-family: var(--font-jp); font-size: 2rem; color: var(--accent-dark); margin: 0 0 1rem;">完了です！</h2>
+                <p id="completion-subtitle" style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem;"></p>
+
+                <!-- Score Section (Quiz only) -->
+                <div id="completion-score" style="display: none; background: var(--accent-soft); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="font-family: var(--font-jp); font-size: 1.5rem; font-weight: 700; color: var(--accent-dark); margin-bottom: 1rem;">
+                        <span id="completion-correct">0</span> / <span id="completion-total">0</span> 正解
+                    </div>
+                    <div style="font-size: 3rem; font-weight: 900; color: var(--accent-dark); margin-bottom: 0.5rem;" id="completion-percentage">0%</div>
+                    <div style="font-family: var(--font-jp); font-size: 1.3rem; font-weight: 700;" id="completion-comment">まぁまぁ</div>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn btn-primary" id="completion-retry" style="flex: 1; min-width: 140px;">もう一度</button>
+                    <button class="btn btn-success" id="completion-next" style="flex: 1; min-width: 140px;">次のレッスン</button>
+                    <button class="btn btn-warning" id="completion-quiz-challenge" style="flex: 1; min-width: 140px; display: none;">クイズに挑戦</button>
+                    <button class="btn btn-secondary" id="completion-back" style="flex: 1; min-width: 140px;">戻る</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats View -->
+        <div id="stats" class="view">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value" id="stats-total">0</div>
+                    <div class="stat-card-label">Total / 全カード</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="stats-new">0</div>
+                    <div class="stat-card-label">New / 新規</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="stats-learning">0</div>
+                    <div class="stat-card-label">Learning / 学習中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="stats-mastered">0</div>
+                    <div class="stat-card-label">Mastered / 習得</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value" id="stats-burned">0</div>
+                    <div class="stat-card-label">Burned / 完成</div>
+                </div>
+            </div>
+
+            <div class="progress-box">
+                <div class="subsection-title">Deck Progress / デッキ別進捗</div>
+                <div id="deck-stats"></div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings" class="view">
+            <div class="settings-box">
+                <h3>⚙️ Settings / 設定</h3>
+                <div class="settings-item">
+                    <label>
+                        <input type="checkbox" id="setting-sound" checked>
+                        <span>Sound Effects / 音声効果</span>
+                    </label>
+                </div>
+                <div class="settings-item" style="margin-top: 2rem; padding-top: 1rem; border-top: 2px dashed var(--line);">
+                    <button class="btn btn-warning" id="btn-reset" style="margin-right: 1rem;">🔄 Reset Progress / リセット</button>
+                    <small style="display: block; margin-top: 0.5rem; color: var(--text-muted);">Cards will be kept. / カードは保持されます。</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================
+        // VOCABULARY DATA STRUCTURE
+        // ========================
+
+        // Subsections for each chapter
+        const SUBSECTIONS = {
+            1: ['1', '1-2', '1-3', '1-4'],
+            2: ['2-1', '2-2', '2-3'],
+            3: ['3-1', '3-2', '3-3', '3-4', '3-6'],
+            4: ['4-1', '4-2', '4-3', '4-5'],
+            5: ['5-2', '5-3'],
+            6: ['6-1', '6-2', '6-3', '6-4'],
+            7: ['7-1', '7-2', '7-4'],
+            8: ['8-1', '8-2', '8-3', '8-4'],
+            9: ['9-1', '9-2', '9-3', '9-4', '9-5'],
+            10: ['10-1', '10-2', '10-3', '10-4'],
+            11: ['11-1', '11-2', '11-3'],
+            12: ['12-1', '12-2', '12-3', '12-4', '12-5', '12-6'],
+            13: ['13-1', '13-2', '13-3', '13-4', '13-5', '13-6'],
+            14: ['14-1', '14-2', '14-3', '14-4', '14-5'],
+            15: ['15-1', '15-2', '15-3', '15-4'],
+            16: ['16-1', '16-2', '16-4', '16-5'],
+            17: ['17-1', '17-2', '17-3', '17-4', '17-5', '17-6'],
+            18: ['18-1', '18-2', '18-3', '18-4', '18-5'],
+            19: ['19-1', '19-2', '19-3', '19-4', '19-5'],
+            20: ['20-1', '20-2', '20-3', '20-4', '20-5', '20-6'],
+            21: ['21-1', '21-2', '21-3', '21-4', '21-5'],
+            22: ['22-1', '22-2', '22-3', '22-4', '22-5'],
+            23: ['23-1', '23-2', '23-3', '23-4', '23-5']
+        };
+
+        const TEXTBOOK_STRUCTURE = {
+            superbegin: {
+                name: '🔰 Super Beginner',
+                step1: [
+                    { id: 'sb-hiragana', name: 'ひらがな / Hiragana' },
+                    { id: 'sb-hiragana-phrase', name: 'ひらがなフレーズ / Phrase' },
+                    { id: 'sb-katakana', name: 'カタカナ / Katakana' },
+                    { id: 'sb-youon', name: '拗音 / Youon' }
+                ],
+                step2: [
+                    { id: 'sb-review', name: 'ひらがな・カタカナ（復習/応用）' },
+                    { id: 'sb-phrases', name: 'かんたんなフレーズ' },
+                    { id: 'sb-body', name: 'からだにまつわる日本語' },
+                    { id: 'sb-datetime', name: '日時の読み方' },
+                    { id: 'sb-greetings', name: '日本のあいさつ' },
+                    { id: 'sb-kitchen', name: 'キッチン日本語' }
+                ]
+            },
+            beginner: {
+                name: '📖 Beginner Textbook',
+                chapters: Array.from({length: 12}, (_, i) => ({
+                    id: `${i+1}`,
+                    number: i+1,
+                    name: `Chapter ${i+1} / 第${i+1}章`,
+                    subsections: SUBSECTIONS[i+1] || []
+                }))
+            },
+            intermediate: {
+                name: '🎯 Intermediate',
+                chapters: Array.from({length: 11}, (_, i) => ({
+                    id: `${i+13}`,
+                    number: i+13,
+                    name: `Chapter ${i+13} / 第${i+13}章`,
+                    subsections: SUBSECTIONS[i+13] || []
+                }))
+            }
+        };
+
+        // Data will be added below (placeholder for now)
+        const VOCABULARY_DATA = {
+  '1': [
+    { jp: 'おもしろい', en: 'interesting; funny' },
+    { jp: 'むずかしい', en: 'difficult' },
+    { jp: 'きのう', en: 'yesterday' },
+    { jp: 'いつか', en: 'someday; one day' },
+    { jp: 'あした', en: 'tomorrow' },
+    { jp: 'わたしの', en: 'my; mine' },
+    { jp: 'かんごし', en: 'nurse' },
+    { jp: 'びようし', en: 'hairdresser' },
+    { jp: 'あめ', en: 'rain' },
+    { jp: 'あなた', en: 'you' },
+    { jp: 'にほんじん', en: 'Japanese person; Japanese' },
+    { jp: 'あに', en: 'older brother' },
+    { jp: 'きょうだい', en: 'siblings; brothers,sisters' },
+    { jp: 'エンジニア', en: 'engineer' },
+    { jp: 'いま', en: 'now; the present' },
+    { jp: '〇〇さい', en: '__ years old' },
+    { jp: 'しゅみ', en: 'hobby' },
+    { jp: 'がくせい', en: 'student' },
+    { jp: 'あね', en: 'older sister' },
+    { jp: 'かいしゃいん', en: 'office worker; company employee' },
+    { jp: 'りょこう', en: 'travel; trip' },
+    { jp: 'しごと', en: 'work; job' },
+    { jp: 'いく', en: 'to go' },
+    { jp: 'べんきょうする', en: 'to study' },
+    { jp: 'しゅっしん', en: 'hometown; place of origin' },
+    { jp: 'せんせい', en: 'teacher' },
+  ],
+  '1-2': [
+    { jp: 'あなたの', en: 'your; yours' },
+    { jp: 'ぶんか', en: 'culture' },
+    { jp: 'ともだち', en: 'friend' },
+    { jp: 'ほん', en: 'book' },
+    { jp: 'たかい', en: 'expensive; high; tall' },
+    { jp: 'たべもの', en: 'food' },
+    { jp: 'スマホ', en: 'smartphone' },
+    { jp: 'げつようび', en: 'Monday' },
+    { jp: 'にちようび', en: 'Sunday' },
+    { jp: 'あたらしい', en: 'new; fresh' },
+    { jp: 'かさ', en: 'umbrella' },
+    { jp: 'かう', en: 'to buy' },
+    { jp: 'おいしい', en: 'delicious' },
+    { jp: 'けいざい', en: 'economics' },
+    { jp: 'おにいさん', en: 'older brother' },
+    { jp: 'その', en: 'that' },
+    { jp: 'とても', en: 'very' },
+    { jp: 'えき', en: 'station' },
+    { jp: 'ひと', en: 'person; people' },
+    { jp: 'この', en: 'this' },
+    { jp: 'いそがしい', en: 'busy' },
+    { jp: 'だいがくせい', en: 'college student; university student' },
+    { jp: 'かわいい', en: 'cute' },
+    { jp: 'せんこう', en: 'major; specialty; field of study' },
+    { jp: 'おとうと', en: 'younger brother' },
+    { jp: 'いもうと', en: 'younger sister' },
+    { jp: 'いしゃ', en: 'doctor' },
+    { jp: 'やすみのひ', en: 'day off; holiday' },
+    { jp: 'かばん', en: 'bag; handbag' },
+  ],
+  '1-3': [
+    { jp: 'へや', en: 'room' },
+    { jp: 'きれい', en: 'clean; pretty; beautiful' },
+    { jp: 'コーヒー', en: 'coffee' },
+    { jp: 'にてる', en: 'to look like; similar' },
+    { jp: 'ペン', en: 'pen' },
+    { jp: 'きんようび', en: 'Friday' },
+    { jp: 'がっこう', en: 'school' },
+    { jp: 'でも', en: 'but' },
+    { jp: 'にほんご', en: 'Japanese' },
+    { jp: 'あかい', en: 'red' },
+    { jp: 'くろい', en: 'black; dark' },
+    { jp: 'ちゃいろ', en: 'brown' },
+    { jp: 'だれの', en: 'whose' },
+    { jp: 'おちゃ', en: 'tea; green tea' },
+    { jp: 'とりあえず', en: 'for now' },
+    { jp: 'らいしゅう', en: 'next week' },
+    { jp: 'カレー', en: 'curry' },
+    { jp: 'しゅくじつ', en: 'holiday' },
+    { jp: 'こんや', en: 'tonight' },
+  ],
+  '1-4': [
+    { jp: 'もの', en: 'thing; object' },
+    { jp: 'いろ', en: 'color' },
+    { jp: 'けっこう', en: 'quite; fairly' },
+    { jp: 'くつ', en: 'shoes' },
+    { jp: 'しゅと', en: 'capital; capital city' },
+    { jp: 'おかあさん', en: 'mother' },
+    { jp: 'めずらしい', en: 'rare; unusual' },
+    { jp: 'ひ', en: 'day; date' },
+    { jp: 'にあう', en: 'to suit; to match; to look good on' },
+    { jp: 'けいたい', en: 'phone' },
+    { jp: 'いえ・うち', en: 'house; home' },
+    { jp: 'どれ', en: 'which' },
+    { jp: 'かぞく', en: 'family' },
+    { jp: 'しゃしん', en: 'photograph; photo' },
+    { jp: 'じてんしゃ', en: 'bicycle' },
+    { jp: 'なまえ', en: 'name' },
+    { jp: 'くるま', en: 'car' },
+    { jp: 'おかあさん/はは', en: 'mother; mom' },
+    { jp: 'おとうさん/ちち', en: 'father; dad' },
+    { jp: 'さいふ', en: 'wallet' },
+    { jp: 'おじいさん', en: 'grandfather' },
+    { jp: 'にんき', en: 'popularity; popular' },
+  ],
+  '2-1': [
+    { jp: 'レストラン', en: 'restaurant' },
+    { jp: 'いりぐち', en: 'entrance; entry' },
+    { jp: 'トイレ', en: 'toilet; restroom' },
+    { jp: 'スーパー', en: 'supermarket' },
+    { jp: 'みず', en: 'water' },
+    { jp: 'シャツ', en: 'shirt' },
+    { jp: 'えいがかん', en: 'movie theater/cinema' },
+    { jp: 'ぼうし', en: 'hat; cap' },
+    { jp: 'ノート', en: 'notebook' },
+    { jp: 'としょかん', en: 'library' },
+    { jp: 'バスてい', en: 'bus stop' },
+    { jp: 'かるい', en: 'light' },
+    { jp: 'だいがく', en: 'college; university' },
+    { jp: 'こうこう', en: 'high school' },
+  ],
+  '2-2': [
+    { jp: 'かぎ', en: 'key' },
+    { jp: 'えんぴつ', en: 'pencil' },
+    { jp: 'ギター', en: 'guitar' },
+    { jp: 'りゅうがくせい', en: 'international student' },
+    { jp: 'でんわばんごう', en: 'phone number' },
+    { jp: 'すてき', en: 'nice' },
+    { jp: 'え', en: 'picture; drawing' },
+    { jp: 'かしゅ', en: 'singer' },
+    { jp: 'だれ', en: 'who' },
+    { jp: 'はは', en: '(my) mother' },
+    { jp: 'きょうしつ', en: 'classroom' },
+    { jp: 'よこ', en: 'side; next to' },
+    { jp: 'でんわ', en: 'telephone; phone' },
+    { jp: 'ばんごう', en: 'number' },
+  ],
+  '2-3': [
+    { jp: 'かんこく', en: 'Korea; South Korea' },
+    { jp: 'ちゅうごく', en: 'China' },
+    { jp: 'えいが', en: 'movie; film' },
+    { jp: 'カフェ', en: 'cafe' },
+    { jp: 'ドラマ', en: 'drama; TV series' },
+    { jp: 'あさごはん', en: 'breakfast' },
+    { jp: 'いぬ', en: 'dog' },
+    { jp: 'ねこ', en: 'cat' },
+    { jp: 'ひるごはん', en: 'lunch' },
+    { jp: 'よるごはん', en: 'dinner; evening meal' },
+    { jp: 'たべる', en: 'to eat' },
+    { jp: 'さかな', en: 'fish' },
+    { jp: 'にく', en: 'meat' },
+    { jp: 'イギリス', en: 'Britain; UK' },
+  ],
+  '3-1': [
+    { jp: 'まいにち', en: 'every day' },
+    { jp: 'やさい', en: 'vegetables' },
+    { jp: 'まいばん', en: 'every night' },
+    { jp: 'よむ', en: 'to read' },
+    { jp: 'そうじする', en: 'to clean' },
+    { jp: 'くる', en: 'to come' },
+    { jp: 'ねる', en: 'to sleep; to go to bed' },
+    { jp: 'みる', en: 'to see; to watch' },
+    { jp: 'のむ', en: 'to drink' },
+    { jp: 'はなす', en: 'to speak; to talk' },
+    { jp: 'いう', en: 'to say; to tell' },
+    { jp: 'する', en: 'to do' },
+    { jp: 'ざっし', en: 'magazine' },
+    { jp: 'きく', en: 'to listen; to ask' },
+    { jp: 'おきる', en: 'to wake up; to get up' },
+    { jp: 'かいしゃ', en: 'company' },
+    { jp: 'きる', en: 'to cut' },
+    { jp: 'おんがく', en: 'music' },
+    { jp: 'しゅうまつ', en: 'weekend' },
+    { jp: 'こうえん', en: 'park' },
+    { jp: 'あるく', en: 'to walk' },
+    { jp: 'はいる', en: 'to enter; to go in' },
+    { jp: 'きる', en: 'to wear; to put on' },
+    { jp: 'はやい', en: 'fast; early' },
+    { jp: 'とる', en: 'to take; to pick up' },
+  ],
+  '3-2': [
+    { jp: 'よく', en: 'often' },
+    { jp: 'たいてい', en: 'usually' },
+    { jp: 'ときどき', en: 'sometimes' },
+    { jp: 'たまに', en: 'once in a while' },
+    { jp: 'あまり', en: 'not very (use with negation)' },
+    { jp: 'ぜんぜん', en: 'not at all (use with negation)' },
+    { jp: 'ゆっくり', en: 'slowly' },
+    { jp: 'はっきり', en: 'clearly' },
+    { jp: 'ちゃんと', en: 'properly; correctly' },
+    { jp: 'しっかり', en: 'firmly; properly' },
+    { jp: 'もう', en: 'already' },
+    { jp: 'まだ', en: 'still; yet' },
+    { jp: 'これから', en: 'from now; starting now' },
+    { jp: 'さっき', en: 'a moment ago; just now' },
+    { jp: 'すぐ', en: 'right away; immediately' },
+    { jp: 'ジョギング', en: 'jogging' },
+    { jp: 'さんぽする', en: 'to take a walk; to stroll' },
+    { jp: 'おぼえる', en: 'to memorize; to remember' },
+    { jp: 'あう', en: 'to meet; to see' },
+    { jp: 'すごす', en: 'to spend' },
+    { jp: 'ねぼうする', en: 'to oversleep' },
+    { jp: 'かえる', en: 'to return; to go back' },
+    { jp: 'うける', en: 'to take (a test); to receive' },
+    { jp: 'およぐ', en: 'to swim' },
+    { jp: 'ひんど', en: 'frequency' },
+    { jp: 'いっしょ', en: 'together' },
+    { jp: 'かつ', en: 'to win; to defeat' },
+  ],
+  '3-3': [
+    { jp: 'でんしゃ', en: 'train' },
+    { jp: 'じかん', en: 'time' },
+    { jp: 'つかう', en: 'to use' },
+    { jp: 'くうこう', en: 'airport' },
+    { jp: 'もくてき', en: 'purpose' },
+    { jp: 'ばしょ', en: 'place' },
+    { jp: 'はし', en: 'chopsticks' },
+    { jp: 'ひこうき', en: 'airplane' },
+    { jp: 'ぎんこう', en: 'bank' },
+    { jp: 'ほうこう', en: 'direction' },
+    { jp: 'こうどう', en: 'action' },
+    { jp: 'のる', en: 'to ride; to get on' },
+    { jp: 'すわる', en: 'to sit' },
+    { jp: 'つくる', en: 'to make; to cook' },
+    { jp: 'あげる', en: 'to give' },
+    { jp: 'かえす', en: 'to return; to give back' },
+    { jp: 'ふだん', en: 'usually; normally' },
+    { jp: 'まいあさ', en: 'every morning' },
+    { jp: 'らいねん', en: 'next year' },
+    { jp: 'らいげつ', en: 'next month' },
+    { jp: 'はたらく', en: 'to work' },
+    { jp: 'いる', en: 'to be; to exist' },
+    { jp: 'まつ', en: 'to wait' },
+    { jp: 'かりる', en: 'to borrow' },
+    { jp: 'びょういん', en: 'hospital' },
+    { jp: 'きほんてきに', en: 'basically' },
+  ],
+  '3-4': [
+    { jp: 'うたう', en: 'to sing' },
+    { jp: 'ていあんする', en: 'to propose; to suggest' },
+    { jp: 'さそう', en: 'to invite' },
+    { jp: 'ことわる', en: 'to refuse; to decline' },
+    { jp: 'ごご', en: 'afternoon' },
+    { jp: 'ひま', en: 'free; have spare time' },
+    { jp: 'ちかい', en: 'near; close' },
+    { jp: 'こんばん', en: 'tonight' },
+    { jp: 'ていねい', en: 'polite; careful' },
+    { jp: 'さそい', en: 'invitation' },
+    { jp: 'かたち', en: 'shape; form' },
+    { jp: 'れんしゅうする', en: 'to practice' },
+    { jp: 'つける', en: 'to turn on' },
+    { jp: 'しゃべる', en: 'to chat; to talk' },
+    { jp: 'けす', en: 'to turn off; to erase' },
+    { jp: 'うんどうする', en: 'to exercise' },
+    { jp: 'はしる', en: 'to run' },
+  ],
+  '3-6': [
+    { jp: 'じょうず', en: 'skillful, good at' },
+    { jp: 'うえ', en: 'above, on' },
+    { jp: 'おおきい', en: 'big' },
+    { jp: 'め', en: 'eye' },
+    { jp: 'ひくい', en: 'low, short (height)' },
+    { jp: 'とくちょう', en: 'characteristic; feature' },
+    { jp: 'ながい', en: 'long' },
+    { jp: 'しぜん', en: 'nature' },
+    { jp: 'かみ', en: 'hair' },
+    { jp: 'からだ', en: 'body' },
+    { jp: 'こたえる', en: 'to answer' },
+    { jp: 'さむい', en: 'cold (weather)' },
+    { jp: 'あつい', en: 'hot (weather)' },
+    { jp: 'てつだう', en: 'to help; to assist' },
+    { jp: 'わだい', en: 'topic' },
+    { jp: 'すでに', en: 'already' },
+    { jp: 'そと', en: 'outside' },
+    { jp: 'じょうほう', en: 'information' },
+    { jp: 'ちがい', en: 'difference' },
+    { jp: 'てんき', en: 'weather' },
+  ],
+  '4-1': [
+    { jp: 'ある', en: 'to exist (for non-living things); to be (there)' },
+    { jp: 'たてもの', en: 'building' },
+    { jp: 'した', en: 'under; below' },
+    { jp: 'なか', en: 'inside' },
+    { jp: 'あいだ', en: 'between' },
+    { jp: 'みぎ', en: 'to the right of; right side' },
+    { jp: 'ひだり', en: 'to the left of; left side' },
+    { jp: 'ちかく', en: 'nearby; vicinity' },
+    { jp: 'となり', en: 'next to; neighboring' },
+    { jp: 'まえ', en: 'in front of; before' },
+    { jp: 'うしろ', en: 'behind; back' },
+    { jp: 'おく', en: 'to put; to place' },
+    { jp: 'みつかる', en: 'to be found; to be discovered' },
+    { jp: 'さがす', en: 'to search; to look for' },
+    { jp: 'そういえば', en: 'by the way' },
+    { jp: 'かいぎしつ', en: 'meeting room' },
+    { jp: 'しりょう', en: 'documents' },
+    { jp: 'つくえ', en: 'desk' },
+    { jp: 'にわ', en: 'garden' },
+    { jp: 'じしょ', en: 'dictionary' },
+    { jp: 'ほんだな', en: 'bookshelf' },
+    { jp: 'きっさてん', en: 'coffee shop; cafe' },
+    { jp: 'おきゃくさん', en: 'customer; guest' },
+    { jp: 'おすすめ', en: 'recommendation' },
+    { jp: 'テーブル', en: 'table' },
+    { jp: 'かんこうち', en: 'tourist spot' },
+    { jp: 'こども', en: 'child' },
+    { jp: 'はな', en: 'flower' },
+    { jp: 'いす', en: 'chair' },
+  ],
+  '4-2': [
+    { jp: 'かこけい', en: 'past tense' },
+    { jp: 'かいわ', en: 'conversation' },
+    { jp: 'ゆき', en: 'snow' },
+    { jp: 'それから', en: 'and then; after that' },
+    { jp: 'こんど', en: 'next time' },
+    { jp: 'どこか', en: 'somewhere' },
+    { jp: 'テレビ', en: 'television; TV' },
+    { jp: 'ぜひ', en: 'by all means; definitely; please do' },
+    { jp: 'て', en: 'hand' },
+    { jp: 'せんげつ', en: 'last month' },
+    { jp: 'わかる', en: 'to understand' },
+    { jp: 'けさ', en: 'this morning' },
+    { jp: 'やく', en: 'to bake; to grill; to roast' },
+    { jp: 'しる', en: 'to know' },
+    { jp: 'せんしゅう', en: 'last week' },
+    { jp: 'げんき', en: 'energetic; healthy' },
+  ],
+  '4-3': [
+    { jp: 'いがい', en: 'unexpected; surprising' },
+    { jp: 'おくる', en: 'to send' },
+    { jp: 'ケーキ', en: 'cake' },
+    { jp: 'びっくり', en: 'surprise; to be surprised' },
+    { jp: 'ならベる', en: 'to line up; to arrange' },
+    { jp: 'よそう', en: 'prediction; expectation' },
+    { jp: 'いくつかの', en: 'several; some' },
+    { jp: 'おみやげ', en: 'souvenir; gift' },
+    { jp: 'ついかする', en: 'to add' },
+    { jp: 'わたす', en: 'to hand over; to pass; to give' },
+    { jp: 'おかし', en: 'snacks; sweets' },
+    { jp: 'やわらかい', en: 'soft; gentle' },
+    { jp: 'しょしんしゃ', en: 'beginner' },
+    { jp: 'ほか', en: 'other; another' },
+  ],
+  '4-5': [
+    { jp: 'つなげる', en: 'to connect; to link' },
+    { jp: 'やくわり', en: 'role; function' },
+    { jp: 'もちもの', en: 'belongings; personal items' },
+    { jp: 'しょゆう', en: 'ownership; possession' },
+    { jp: 'せつめい', en: 'explanation' },
+    { jp: 'いじょう', en: 'more than; or above' },
+    { jp: 'または', en: 'or; alternatively' },
+    { jp: 'コンビニ', en: 'convenience store' },
+    { jp: 'タクシー', en: 'taxi' },
+    { jp: 'ぜんぶ', en: 'all; everything' },
+    { jp: 'いちぶ', en: 'part; portion' },
+    { jp: 'ほんや', en: 'bookstore' },
+    { jp: 'なにか', en: 'something' },
+    { jp: 'このまえ', en: 'the other day; recently' },
+    { jp: 'あまい', en: 'sweet' },
+    { jp: 'たまご', en: 'egg' },
+    { jp: 'りんご', en: 'apple' },
+    { jp: 'しょうがっこう', en: 'elementary school' },
+    { jp: 'ルール', en: 'rule' },
+    { jp: 'ゲーム', en: 'game' },
+    { jp: 'ごはん', en: 'rice; meal' },
+    { jp: 'パン', en: 'bread' },
+    { jp: '5－1', en: '#REF!' },
+    { jp: 'つよい', en: 'strong' },
+    { jp: 'たのしい', en: 'fun; enjoyable' },
+    { jp: 'いい', en: 'good' },
+    { jp: 'ちいさい', en: 'small' },
+    { jp: 'しずか', en: 'quiet' },
+    { jp: 'きれい', en: 'clean; beautiful' },
+    { jp: 'うれしい', en: 'happy; glad' },
+    { jp: 'おおい', en: 'many; a lot of' },
+    { jp: 'べんり', en: 'convenient' },
+    { jp: 'つまらない', en: 'boring' },
+    { jp: 'しんせつ・やさしい', en: 'kind; gentle' },
+    { jp: 'かんたん', en: 'easy; simple' },
+    { jp: 'さいきん', en: 'recently; lately' },
+    { jp: 'うつくしい', en: 'beautiful' },
+    { jp: 'ひま', en: 'free; not busy' },
+    { jp: 'せっきょくてき', en: 'proactive; active' },
+    { jp: 'かっこいい', en: 'cool; stylish' },
+    { jp: 'にぎやか', en: 'lively; bustling' },
+    { jp: 'ねむい', en: 'sleepy' },
+    { jp: 'すっきり', en: 'refreshed; clear' },
+    { jp: 'ちょっと', en: 'a little; a bit' },
+    { jp: 'ふるい', en: 'old' },
+    { jp: 'やすい', en: 'cheap; inexpensive' },
+    { jp: 'すきな', en: 'to like; favorite' },
+    { jp: 'きもちよい', en: 'pleasant; comfortable; refreshing' },
+    { jp: 'ぼく', en: 'I (used by men)' },
+  ],
+  '5-2': [
+    { jp: 'だいすき', en: 'love; like very much' },
+    { jp: 'きらい', en: 'dislike' },
+    { jp: 'だいきらい', en: 'hate; detest' },
+    { jp: 'あんまり', en: 'not much; not very' },
+    { jp: 'にがい', en: 'bitter' },
+    { jp: 'ずっと', en: 'all the time; continuously' },
+    { jp: 'におい', en: 'smell; odor' },
+    { jp: 'だめ', en: 'no good; not allowed' },
+    { jp: 'どちら', en: 'which (of two); either' },
+    { jp: 'どんな', en: 'what kind of; what sort of' },
+    { jp: 'すごく', en: 'extremely' },
+    { jp: 'アニメ', en: 'anime' },
+    { jp: 'れきし', en: 'history' },
+    { jp: 'がっき', en: 'musical instrument' },
+    { jp: 'からて', en: 'karate' },
+    { jp: 'まつり', en: 'festival' },
+    { jp: 'つり', en: 'fishing' },
+    { jp: 'こうちゃ', en: 'black tea' },
+    { jp: 'まち', en: 'town; city' },
+  ],
+  '5-3': [
+    { jp: 'にもつ', en: 'luggage, baggage' },
+    { jp: 'ちょうど', en: 'exactly, just' },
+    { jp: 'パーティ－', en: 'party' },
+    { jp: 'よかったら', en: 'if you’d like / if it’s okay' },
+    { jp: 'のんびりする', en: 'relax' },
+    { jp: 'へいじつ', en: 'weekday' },
+    { jp: 'やすむ', en: 'to rest; to take a break' },
+    { jp: 'よやくする', en: 'to make a reservation; to book' },
+    { jp: 'もつ', en: 'to hold; to have; to carry' },
+    { jp: 'しゅくだい', en: 'homework' },
+    { jp: 'かす', en: 'to lend' },
+    { jp: 'やる', en: 'to do; to perform' },
+    { jp: 'ゆうがた', en: 'evening' },
+  ],
+  '6-1': [
+    { jp: 'へんかする', en: 'to change; to transform' },
+    { jp: 'コピーする', en: 'to make a copy' },
+    { jp: 'もういっかい・もういちど', en: 'one more time; again' },
+    { jp: 'ボタン', en: 'button' },
+    { jp: 'まど', en: 'window' },
+    { jp: 'やりかた', en: 'how to do; method; way of doing' },
+    { jp: 'プリント', en: 'handout; printout' },
+    { jp: 'まず', en: 'first; to begin with' },
+    { jp: 'おと', en: 'sound; noise' },
+    { jp: 'いらい', en: 'request' },
+    { jp: 'おねがい', en: 'request; favor' },
+    { jp: 'しぬ', en: 'to die; to pass away' },
+    { jp: 'かぎをかける', en: 'to lock' },
+    { jp: 'きょうかしょ', en: 'textbook' },
+    { jp: 'つぎ', en: 'next' },
+  ],
+  '6-2': [
+    { jp: 'どうさ', en: 'movement; action' },
+    { jp: 'うらやましい', en: 'envious; jealous' },
+    { jp: 'さいしょに', en: 'first; at the beginning' },
+    { jp: 'きゅうじつ', en: 'holiday; day off' },
+    { jp: 'あびる', en: 'to bathe; to take (a shower)' },
+    { jp: 'オフィス', en: 'office' },
+    { jp: 'おゆをわかす', en: 'to boil water' },
+    { jp: 'かみをとかす', en: 'to comb one\'s hair' },
+    { jp: 'ひげをそる', en: 'to shave one\'s beard' },
+    { jp: 'けしょうする', en: 'to put on makeup' },
+  ],
+  '6-3': [
+    { jp: 'きょか', en: 'permission' },
+    { jp: 'きんし', en: 'prohibition; ban' },
+    { jp: 'きめる', en: 'to decide' },
+    { jp: 'すべる', en: 'to slip/slide' },
+    { jp: 'まなぶ', en: 'to learn' },
+    { jp: 'きゅうけい', en: 'break; rest' },
+    { jp: 'しめる', en: 'to close' },
+    { jp: 'はらう', en: 'to pay' },
+    { jp: 'しつもんする', en: 'to ask a question' },
+    { jp: 'パソコン', en: 'personal computer; PC' },
+    { jp: 'じゆう', en: 'freedom' },
+  ],
+  '6-4': [
+    { jp: 'じゅんばん', en: 'order; turn; sequence' },
+    { jp: 'りゆう', en: 'reason' },
+    { jp: 'じゅぎょう', en: 'class; lesson' },
+    { jp: 'にっき', en: 'diary; journal' },
+    { jp: 'つかれる', en: 'to get tired' },
+    { jp: 'せつめいする', en: 'to explain' },
+    { jp: 'でんわする', en: 'to make a phone call; to call' },
+    { jp: 'きまる', en: 'to be decided' },
+  ],
+  '7-1': [
+    { jp: 'とちゅう', en: 'on the way; in the middle of' },
+    { jp: 'しゅうかん', en: 'habit; custom' },
+    { jp: 'じょうたい', en: 'state; condition' },
+    { jp: 'ちゅうい', en: 'caution; attention' },
+    { jp: 'けっか', en: 'result; outcome' },
+    { jp: 'えらぶ', en: 'to choose; to select' },
+    { jp: 'あらう', en: 'to wash' },
+    { jp: 'さわる', en: 'to touch' },
+    { jp: 'たすける', en: 'to help; to save' },
+    { jp: 'でかける', en: 'to go out' },
+    { jp: 'ぬぐ', en: 'to take off (clothes, shoes)' },
+    { jp: 'とぶ', en: 'to fly' },
+    { jp: 'ハマる', en: 'to be into; to get hooked on' },
+    { jp: 'ふく', en: 'to wipe' },
+    { jp: 'さら', en: 'plate; dish' },
+    { jp: 'けっこんする', en: 'to get married' },
+    { jp: 'ならう', en: 'to learn' },
+    { jp: 'けんかする', en: 'to have a fight; to quarrel' },
+    { jp: 'ダイエットする', en: 'to go on a diet' },
+    { jp: 'かぶる', en: 'to put on (a hat)' },
+  ],
+  '7-2': [
+    { jp: 'しょうかいする', en: 'to introduce' },
+    { jp: 'あぶない', en: 'dangerous' },
+    { jp: 'うるさい', en: 'noisy; loud' },
+    { jp: 'せまい', en: 'narrow; small(space)' },
+    { jp: 'あたまがいい', en: 'smart; intelligent' },
+    { jp: 'おしゃれ', en: 'stylish; fashionable' },
+    { jp: 'とくに', en: 'especially; particularly' },
+    { jp: 'しぜんに', en: 'naturally' },
+    { jp: 'しょくどう', en: 'cafeteria; dining commons' },
+    { jp: 'デパート', en: 'department store' },
+  ],
+  '7-4': [
+    { jp: 'かわ', en: 'river' },
+    { jp: 'さくら', en: 'cherry blossoms' },
+    { jp: 'いどうする', en: 'to move (from place to place)' },
+    { jp: 'せいと', en: 'student; pupil' },
+    { jp: 'ふじさん', en: 'Mt. Fuji' },
+    { jp: 'だす', en: 'to submit; turn in' },
+    { jp: 'もうしこみしょ', en: 'application form' },
+    { jp: 'むかえにいく', en: 'to pick up; meet' },
+  ],
+  '8-1': [
+    { jp: 'もっていく', en: 'to bring' },
+    { jp: 'まちあわせ', en: 'meeting up' },
+  ],
+  '8-2': [
+    { jp: 'かんどうする', en: 'to be moved; to be touched' },
+    { jp: 'イライラする', en: 'to get irritated' },
+    { jp: 'いけん', en: 'opinion' },
+    { jp: 'さいしょ', en: 'the beginning; at first' },
+    { jp: 'かんがえ', en: 'idea; thought' },
+    { jp: 'しけん', en: 'exam; test' },
+    { jp: 'かんどうてき', en: 'moving; touching' },
+    { jp: 'さいご', en: 'the end; the last' },
+    { jp: 'つたえる', en: 'to convey; to tell' },
+    { jp: 'おもう', en: 'to think' },
+    { jp: 'ごみ', en: 'trash; garbage' },
+  ],
+  '8-3': [
+    { jp: 'せんたくする', en: 'to do the laundry' },
+    { jp: 'おどる', en: 'to dance' },
+    { jp: 'ホラーえいが', en: 'horror movie' },
+    { jp: 'へた', en: 'bad at; unskillful' },
+    { jp: 'カラオケ', en: 'karaoke' },
+    { jp: 'かんぱい', en: 'cheers' },
+  ],
+  '8-4': [
+    { jp: 'みんなで', en: 'together; all together' },
+    { jp: 'もってくる', en: 'to bring (to here)' },
+  ],
+  '9-1': [
+    { jp: 'からい', en: 'spicy' },
+    { jp: 'まずい', en: 'bad-tasting; poor' },
+    { jp: 'わかい', en: 'young' },
+    { jp: 'あじ', en: 'taste; flavor' },
+    { jp: 'れんあい', en: 'romance; love' },
+    { jp: 'インスタントラーメン', en: 'instant ramen' },
+    { jp: 'みため', en: 'appearance; looks' },
+    { jp: 'まあまあ', en: 'okay; so-so' },
+    { jp: 'コンサート', en: 'concert' },
+    { jp: 'チケット', en: 'ticket' },
+  ],
+  '9-2': [
+    { jp: 'そのまま', en: 'as is; just like that' },
+    { jp: 'だいどころ', en: 'kitchen' },
+    { jp: 'じゃがいも', en: 'potato' },
+    { jp: 'さきに', en: 'ahead; before; first' },
+    { jp: 'あまくち', en: 'mild taste; sweet flavor' },
+    { jp: 'ふたり', en: 'two people; a pair' },
+    { jp: 'ぺこぺこ', en: 'hungry/starving' },
+    { jp: 'しゅっぱつする', en: 'to depart' },
+  ],
+  '9-3': [
+    { jp: 'めがね', en: 'glasses' },
+    { jp: 'はなしかける', en: 'to start talking to; to speak to' },
+    { jp: 'きっと', en: 'surely; probably' },
+    { jp: 'おべんとう', en: 'boxed lunch' },
+    { jp: 'かれし', en: 'boyfriend' },
+    { jp: 'いじわる', en: 'mean; mean-spirited' },
+  ],
+  '9-4': [
+    { jp: 'げんざい', en: 'present; current' },
+    { jp: 'やちん', en: 'rent' },
+    { jp: 'でんきだい', en: 'electricity bill' },
+    { jp: 'メッセージ', en: 'message' },
+    { jp: 'くすり', en: 'medicine' },
+    { jp: 'ところで', en: 'by the way' },
+  ],
+  '9-5': [
+    { jp: 'さき', en: 'before; first' },
+    { jp: 'あと', en: 'after; later' },
+    { jp: 'ちこくする', en: 'to be late; be tardy' },
+    { jp: 'こわれる', en: 'to break; to be broken' },
+    { jp: 'こうさてん', en: 'intersection' },
+    { jp: 'たいへん', en: 'tough; hard; serious' },
+    { jp: 'けんこう', en: 'health' },
+    { jp: 'ペダル', en: 'pedal' },
+    { jp: 'いそぐ', en: 'to hurry' },
+    { jp: 'きせつ', en: 'season' },
+  ],
+  '10-1': [
+    { jp: 'くだもの', en: 'fruit' },
+    { jp: 'くらべる', en: 'to compare' },
+    { jp: 'ゆっくりする', en: 'to relax' },
+    { jp: 'やま', en: 'mountain' },
+    { jp: 'としうえ', en: 'older; older person' },
+    { jp: 'どうぶつ', en: 'animal' },
+    { jp: 'ぞう', en: 'elephant' },
+    { jp: 'リビング', en: 'living room' },
+    { jp: 'すずしい', en: 'cool (temperature)' },
+    { jp: 'きもちいい', en: 'feels good' },
+    { jp: 'みせ', en: 'shop; store' },
+    { jp: 'おかねもち', en: 'rich person' },
+    { jp: 'ゆうめいじん', en: 'celebrity' },
+    { jp: 'てぶくろ', en: 'gloves' },
+  ],
+  '10-2': [
+    { jp: 'シンプル', en: 'simple' },
+    { jp: 'みどり', en: 'green' },
+    { jp: 'プレーン', en: 'plain (flavor)' },
+    { jp: 'りょかん', en: 'Japanese inn' },
+    { jp: '２かい', en: 'twice' },
+    { jp: 'スッキリする', en: 'to feel refreshed or clear' },
+    { jp: 'とまる', en: 'to stay (overnight)' },
+    { jp: 'カラフル', en: 'colorful' },
+    { jp: 'スタイル', en: 'style' },
+    { jp: 'そういう', en: 'that kind of; such' },
+  ],
+  '10-3': [
+    { jp: 'バーベキュー', en: 'barbecue; BBQ' },
+    { jp: 'まちがい', en: 'mistake' },
+    { jp: 'うっかり', en: 'carelessly; by mistake' },
+    { jp: 'せめる', en: 'to blame' },
+    { jp: 'やぶる', en: 'to break' },
+    { jp: 'いいわけする', en: 'to make excuses' },
+    { jp: 'いし', en: 'intention; will' },
+    { jp: 'じつは', en: 'actually; to tell the truth' },
+    { jp: 'がいこく', en: 'foreign country' },
+    { jp: 'おてあらい', en: 'restroom' },
+    { jp: 'がいこくご', en: 'foreign language' },
+    { jp: 'ちかてつ', en: 'subway; metro' },
+  ],
+  '10-4': [
+    { jp: 'へんか', en: 'change' },
+    { jp: 'まえより', en: 'than before' },
+    { jp: 'あんしんする', en: 'to feel relieved' },
+    { jp: 'だんだん', en: 'gradually' },
+    { jp: 'すこしずつ', en: 'little by little' },
+    { jp: 'なれる', en: 'to get used to' },
+    { jp: 'ひっこしをする / ひっこす', en: 'to move residence' },
+    { jp: 'びょうき', en: 'illness' },
+    { jp: 'せいかく', en: 'personality' },
+    { jp: 'おちつく', en: 'to feel calm' },
+    { jp: 'とかい', en: 'city; metropolis' },
+    { jp: 'せいかつする', en: 'to live' },
+    { jp: 'べんきょうねっしん', en: 'studious' },
+    { jp: 'しかたない', en: 'it can\'t be helped' },
+    { jp: 'きらくに', en: 'easily; without pressure' },
+    { jp: 'にがて', en: 'be bad at' },
+    { jp: 'このごろ', en: 'these days' },
+  ],
+  '11-1': [
+    { jp: 'ひさしぶり', en: 'long time no see' },
+    { jp: 'しらべる', en: 'to check; to research' },
+    { jp: 'まにあう', en: 'to be in time' },
+    { jp: 'ならぶ', en: 'to line up; to stand in a line' },
+    { jp: 'あまいもの', en: 'sweets' },
+    { jp: 'どうぶつえん', en: 'zoo' },
+    { jp: 'ゆうべ', en: 'last night' },
+    { jp: 'アイス', en: 'ice cream' },
+    { jp: 'しょくぎょう', en: 'occupation' },
+    { jp: 'けいさつかん', en: 'police officer' },
+    { jp: 'しょうぼうし', en: 'firefighter' },
+    { jp: 'スポーツせんしゅ', en: 'athlete' },
+    { jp: 'まんがか', en: 'cartoonist' },
+    { jp: 'だいとうりょう', en: 'president' },
+    { jp: 'そして', en: 'and then' },
+  ],
+  '11-2': [
+    { jp: 'ひろう', en: 'to pick up' },
+    { jp: 'かいがら', en: 'shell' },
+    { jp: 'ハイキングする', en: 'to hike' },
+    { jp: 'おわらい', en: 'comedy' },
+    { jp: 'ばんぐみ', en: 'TV program' },
+    { jp: 'わらう', en: 'to laugh' },
+    { jp: 'しょうがつ', en: 'New Year (Japanese)' },
+    { jp: 'もち', en: 'rice cake; mochi' },
+    { jp: 'なく', en: 'to cry' },
+    { jp: 'つもる', en: 'to pile up' },
+    { jp: 'ふる', en: 'to fall (precipitation)' },
+    { jp: 'たいせつ', en: 'important' },
+    { jp: 'ごろごろする', en: 'to laze around' },
+    { jp: 'みがく', en: 'to brush' },
+    { jp: 'キャンプ', en: 'camp' },
+    { jp: 'ドライブ', en: 'drive' },
+  ],
+  '11-3': [
+    { jp: 'けいけんする', en: 'to experience' },
+    { jp: 'みつける', en: 'to find' },
+    { jp: 'おちる', en: 'to fall' },
+    { jp: 'しょうせつ', en: 'novel' },
+    { jp: 'てら', en: 'temple' },
+    { jp: 'すもう', en: 'sumo' },
+    { jp: 'おんせん', en: 'hot spring' },
+    { jp: 'しあい', en: 'game; match' },
+    { jp: 'しんかんせん', en: 'Shinkansen; bullet train' },
+    { jp: 'のぼる', en: 'to climb' },
+    { jp: 'はなび', en: 'fireworks' },
+    { jp: 'ひく', en: 'to play' },
+    { jp: 'うそをつく', en: 'to tell a lie' },
+    { jp: 'さぼる', en: 'to cut classes; to skip' },
+  ],
+  '12-1': [
+    { jp: 'いたい', en: 'painful; hurts' },
+    { jp: 'おごる', en: 'to treat; to pay' },
+    { jp: 'そんなに', en: 'that much; so (much)' },
+    { jp: 'かわく', en: 'to be thirsty; to get thirsty' },
+    { jp: 'まいご', en: 'lost; being lost' },
+    { jp: 'やめる', en: 'to stop; to quit' },
+    { jp: 'じゅんび', en: 'preparation' },
+    { jp: 'インフルエンザ', en: 'influenza; flu' },
+  ],
+  '12-2': [
+    { jp: 'すっぱい', en: 'sour' },
+    { jp: 'しょっぱい', en: 'salty' },
+    { jp: 'うすい', en: 'thin' },
+    { jp: 'くらい', en: 'dark' },
+    { jp: 'ごうか', en: 'gorgeous; luxurious' },
+    { jp: 'はで', en: 'flashy; showy' },
+    { jp: 'てきとう', en: 'careless; random' },
+    { jp: 'ふべん', en: 'inconvenient' },
+    { jp: 'ふゆ', en: 'winter' },
+    { jp: 'さんせい', en: 'I agree; approval' },
+    { jp: 'はずかしい', en: 'embarrassing; shy' },
+    { jp: 'あきる', en: 'to get bored; to be tired of' },
+    { jp: 'さけ', en: 'alcohol' },
+    { jp: 'ふろば', en: 'bathroom (bath area)' },
+    { jp: 'びっくりする', en: 'to be surprised' },
+    { jp: 'もちあるく', en: 'to carry around' },
+  ],
+  '12-3': [
+    { jp: 'ねぶそく', en: 'lack of sleep' },
+    { jp: 'おそくまで', en: 'until late' },
+    { jp: 'へらす', en: 'to reduce; to decrease' },
+    { jp: 'アルバイト', en: 'part-time job' },
+    { jp: 'むりをする', en: 'to overdo; to push oneself too hard' },
+    { jp: 'なおす', en: 'to fix; to correct' },
+    { jp: 'プレゼン', en: 'presentation' },
+    { jp: 'だいじょうぶ', en: 'okay; all right' },
+    { jp: 'おだいじに。', en: 'Get well soon.' },
+    { jp: 'できるだけ', en: 'as much as possible' },
+    { jp: 'せいじ', en: 'politics' },
+  ],
+  '12-4': [
+    { jp: 'ねつ', en: 'fever' },
+    { jp: 'ねぼう', en: 'oversleep' },
+    { jp: 'カバーする', en: 'to cover (for someone)' },
+    { jp: 'さがる', en: 'to go down' },
+    { jp: 'おかげさまで', en: 'thanks to you (polite set phrase)' },
+    { jp: 'たすかる', en: 'to be helped; saved' },
+    { jp: 'ぬれる', en: 'to get wet' },
+    { jp: 'じゅうたい', en: 'traffic jam' },
+    { jp: 'きがついたら', en: 'before I knew it' },
+    { jp: 'しんぱいする', en: 'to worry' },
+    { jp: 'ふつかよい', en: 'hangover' },
+    { jp: 'アレルギー', en: 'allergy' },
+    { jp: 'せいせき', en: 'grade (on a test)' },
+  ],
+  '12-5': [
+    { jp: 'いいんちょう', en: 'committee chairperson' },
+    { jp: 'かいぎ', en: 'meeting' },
+    { jp: 'ぜったい', en: 'absolutely; definitely' },
+    { jp: 'れんらくする', en: 'to contact' },
+    { jp: 'さんかする', en: 'to participate' },
+    { jp: 'レポート', en: 'report' },
+    { jp: 'はいしゃ', en: 'dentist' },
+    { jp: 'かじ', en: 'housework; chores' },
+    { jp: 'きっぷ', en: 'ticket' },
+    { jp: 'スピーチ', en: 'speech' },
+    { jp: 'ゆうびんきょく', en: 'post office' },
+    { jp: 'へんかんする', en: 'to convert; transform' },
+    { jp: 'しょくりょうひん', en: 'groceries' },
+    { jp: 'しょくぶつ', en: 'plant' },
+    { jp: 'まもる', en: 'to follow; obey' },
+  ],
+  '12-6': [
+    { jp: 'たぶん', en: 'probably' },
+    { jp: 'おそらく', en: 'probably' },
+    { jp: 'ていしゅつする', en: 'to submit' },
+    { jp: 'なる', en: 'to become' },
+    { jp: 'かかる', en: 'to take (time, money)' },
+    { jp: 'ぶちょう', en: 'manager; department head' },
+    { jp: 'はじまる', en: 'to start; to begin' },
+    { jp: 'きおん', en: 'temperature' },
+    { jp: 'じむしょ', en: 'office' },
+    { jp: 'さらに', en: 'furthermore; even more' },
+  ],
+  '13-1': [
+    { jp: 'えきまえ', en: 'in front of the station' },
+    { jp: 'おとな', en: 'adult' },
+    { jp: 'あむ', en: 'to knit' },
+    { jp: 'おかげで', en: 'thanks to' },
+  ],
+  '13-2': [
+    { jp: 'すすめる', en: 'to advance; to proceed; to promote' },
+    { jp: 'それに', en: 'and; besides; moreover' },
+    { jp: 'おとく', en: 'good deal; good value' },
+    { jp: 'なっとく', en: 'consent; agreement' },
+    { jp: 'りょう', en: 'quantity; amount' },
+    { jp: 'やっぱり', en: 'as expected; after all' },
+    { jp: 'いちばん', en: 'number one; best; most' },
+    { jp: 'ちがう', en: 'to differ; to be wrong' },
+    { jp: 'しなもの', en: 'goods; items; merchandise' },
+    { jp: 'じょうぶ', en: 'durable; sturdy' },
+    { jp: 'あんぜん', en: 'safe' },
+    { jp: 'かんこうきゃく', en: 'tourist' },
+    { jp: 'おとずれる', en: 'to visit' },
+    { jp: 'せきにんかん', en: 'sense of responsibility' },
+    { jp: 'しんらい', en: 'trust' },
+    { jp: 'でる', en: 'to leave; to go out; to come out' },
+    { jp: 'すごい', en: 'incredible; awesome' },
+    { jp: 'いろいろ', en: 'various; different kinds of' },
+  ],
+  '13-3': [
+    { jp: 'ふわふわ', en: 'fluffy; softly' },
+    { jp: 'しっとり', en: 'moist; soft' },
+    { jp: 'みたかんじ', en: 'from the look of it; appearance' },
+    { jp: 'こむ', en: 'to be crowded' },
+    { jp: 'ふんいき', en: 'atmosphere; mood; ambience' },
+    { jp: 'きんちょう', en: 'nervousness; tension' },
+    { jp: 'じっさい', en: 'in reality; actually' },
+    { jp: 'いんしょう', en: 'impression' },
+  ],
+  '13-4': [
+    { jp: 'はく', en: 'to wear (shoes, pants, skirt, etc.)' },
+    { jp: 'ためす', en: 'to try' },
+    { jp: 'どりょくする', en: 'to make an effort; to work hard' },
+    { jp: 'しんさく', en: 'new work; new release' },
+    { jp: 'きになる', en: 'to be curious; to be concerned about' },
+    { jp: 'ひとくち', en: 'a bite; a mouthful' },
+    { jp: 'どりょく', en: 'effort' },
+    { jp: 'げんてい', en: 'limit; restriction' },
+    { jp: 'べつ', en: 'separate; different' },
+    { jp: 'とく', en: 'to solve; to untie' },
+    { jp: 'あらわす', en: 'to express; to represent' },
+    { jp: 'きもち', en: 'feeling; mood' },
+    { jp: 'ためしに', en: 'as a trial; just to try' },
+    { jp: 'あう', en: 'to fit; to match; to suit' },
+    { jp: 'はつおん', en: 'pronunciation' },
+  ],
+  '13-5': [
+    { jp: 'どこでも', en: 'anywhere' },
+    { jp: 'しぼる', en: 'to narrow down; to squeeze' },
+    { jp: 'じょうけん', en: 'condition; requirement' },
+    { jp: 'ぜんたい', en: 'whole; overall' },
+    { jp: 'ことば', en: 'word; language' },
+    { jp: 'ばあい', en: 'case; situation' },
+    { jp: 'くわしい', en: 'detailed; knowledgeable' },
+    { jp: 'あく', en: 'to be empty; to be available' },
+    { jp: 'あそぶ', en: 'to play; to hang out' },
+  ],
+  '13-6': [
+    { jp: 'かいすう', en: 'number of times' },
+    { jp: 'きかん', en: 'period; duration' },
+    { jp: 'どれくらい', en: 'how much; how long; how often' },
+    { jp: 'なんかい', en: 'how many times' },
+    { jp: 'がいしょくする', en: 'to eat out' },
+    { jp: 'がいしょく', en: 'eating out' },
+    { jp: 'いままで', en: 'until now; so far' },
+    { jp: 'くらい', en: 'about; approximately' },
+    { jp: 'ほとんど', en: 'almost; mostly' },
+    { jp: 'ぼしゅう', en: 'recruitment' },
+    { jp: 'しゅっちょう', en: 'business trip' },
+  ],
+  '14-1': [
+    { jp: 'ほしい', en: 'to want (desire to have something)' },
+    { jp: 'べつに', en: 'not particularly' },
+    { jp: 'ふえる', en: 'to increase' },
+    { jp: 'トレーナー', en: 'sweatshirt' },
+    { jp: 'ネクタイ', en: 'necktie' },
+    { jp: 'マフラー', en: 'winter scarf' },
+    { jp: 'マンション', en: 'multistory apartment building; condominium' },
+  ],
+  '14-2': [
+    { jp: 'にちじょうかいわ', en: 'everyday conversation' },
+    { jp: 'さくや', en: 'last night' },
+    { jp: 'かぜ', en: 'a cold (illness)' },
+    { jp: 'よふかし', en: 'staying up late' },
+    { jp: 'すいぶん', en: 'water intake; moisture' },
+    { jp: 'むくむ', en: 'to swell; to become puffy' },
+    { jp: 'ひえる', en: 'to get cold; to cool down' },
+    { jp: 'なんか', en: 'like; sort of; kind of' },
+    { jp: 'ふたしか', en: 'uncertain' },
+    { jp: 'しょうらい', en: 'future' },
+    { jp: 'おおやさん', en: 'landlord; landlady' },
+  ],
+  '14-3': [
+    { jp: 'くれる', en: 'to give' },
+    { jp: 'もらう', en: 'to receive; to get' },
+    { jp: 'あたえる', en: 'to give; to grant (formal)' },
+    { jp: 'うけとる', en: 'to receive; to accept' },
+    { jp: 'たんじょうび', en: 'birthday' },
+    { jp: 'めっちゃ', en: 'very; super; really (slang)' },
+    { jp: 'きづかう', en: 'to be considerate; to be mindful' },
+    { jp: 'キーホルダー', en: 'key holder; keychain' },
+    { jp: 'おや', en: 'parents' },
+    { jp: 'はがき', en: 'postcard' },
+    { jp: 'まちがえる', en: 'to make a mistake' },
+    { jp: 'けち', en: 'stingy; cheap' },
+    { jp: 'ゆびわ', en: 'ring' },
+  ],
+  '14-4': [
+    { jp: 'なかがいい', en: 'be close; get along well; be good friends' },
+    { jp: 'ていあん', en: 'suggestion; proposal' },
+    { jp: 'そうだんする', en: 'to consult; to ask for advice' },
+    { jp: 'そうだん', en: 'consultation; advice' },
+    { jp: 'かんけい', en: 'relationship; connection' },
+    { jp: 'ばめん', en: 'scene; situation' },
+    { jp: 'ひはんてき', en: 'critical' },
+    { jp: 'たんしゅくする', en: 'to shorten; to reduce' },
+    { jp: 'きこえる', en: 'to be heard; to sound' },
+    { jp: 'さぎょう', en: 'work; task' },
+    { jp: 'それなら', en: 'if so; in that case' },
+    { jp: 'きく', en: 'to be effective; to work (medicine)' },
+    { jp: 'うわぎ', en: 'jacket; outerwear' },
+    { jp: 'ほうほう', en: 'method; way' },
+    { jp: 'うんどうぶそく', en: 'lack of exercise' },
+    { jp: 'もっと', en: 'more' },
+    { jp: 'りれきしょ', en: 'resume; résumé' },
+  ],
+  '14-5': [
+    { jp: 'みかん', en: 'mandarin orange' },
+    { jp: 'こうしきサイト', en: 'official website' },
+    { jp: 'りかいする', en: 'to understand' },
+    { jp: 'じゆうじかん', en: 'free time' },
+    { jp: 'まわり', en: 'around; surroundings' },
+    { jp: 'げんきん', en: 'cash' },
+    { jp: 'きょうちょうする', en: 'to emphasize' },
+    { jp: 'かんじる', en: 'to feel; to sense' },
+  ],
+  '15-1': [
+    { jp: 'ついでに', en: 'on the way; while you are at it' },
+    { jp: 'しんじる', en: 'to believe; to trust' },
+    { jp: 'ざいりょう', en: 'ingredient; material' },
+    { jp: 'そろそろ', en: 'soon; it\'s about time' },
+    { jp: 'おなか', en: 'stomach' },
+    { jp: 'とにかく', en: 'anyhow; anyway' },
+    { jp: 'えきいん(さん)', en: 'station attendant' },
+    { jp: 'わりびきけん', en: 'discount coupon' },
+    { jp: 'こうかんする', en: 'to exchange' },
+    { jp: 'かぐ', en: 'furniture' },
+  ],
+  '15-2': [
+    { jp: 'りゅうがく', en: 'study abroad' },
+    { jp: 'ひょうげん', en: 'expression; phrase' },
+    { jp: 'がんばる', en: 'to do one\'s best; to work hard' },
+    { jp: 'ごほうび', en: 'reward' },
+    { jp: 'あわせる', en: 'to match; to adjust' },
+    { jp: 'プロポーズする', en: 'to propose marriage' },
+    { jp: 'ほかの', en: 'other' },
+    { jp: 'よてい', en: 'schedule; plan' },
+    { jp: 'おろす', en: 'to withdraw (money)' },
+    { jp: 'はっぴょう', en: 'presentation' },
+    { jp: 'よる', en: 'to stop by' },
+  ],
+  '15-3': [
+    { jp: 'じゅうでんする', en: 'to charge (a device)' },
+    { jp: 'まえもって', en: 'in advance; beforehand' },
+    { jp: 'ひやけどめ', en: 'sunscreen' },
+    { jp: 'ばしょとり', en: 'saving a spot; reserving a place' },
+    { jp: 'はやめに', en: 'a little early; earlier than usual' },
+    { jp: 'アラーム', en: 'alarm' },
+    { jp: 'すいとう', en: 'water bottle; canteen' },
+    { jp: 'バタバタする', en: 'to be busy; to rush around' },
+    { jp: 'ふくしゅうする', en: 'to review (what you learned)' },
+    { jp: 'あんないする', en: 'to guide; to show around' },
+    { jp: 'あつめる', en: 'to collect; to gather' },
+    { jp: 'たいちょう', en: 'physical condition; health condition' },
+    { jp: 'くずす', en: 'to ruin; to break (a balance); to collapse' },
+    { jp: 'とりこむ', en: 'to take in; to import; to bring in' },
+    { jp: 'せんたくもの', en: 'laundry' },
+    { jp: 'でんち', en: 'battery' },
+    { jp: 'ぜいきん', en: 'tax' },
+    { jp: 'ほけん', en: 'insurance' },
+    { jp: 'さいてい', en: 'the lowest; the worst' },
+  ],
+  '15-4': [
+    { jp: 'このみ', en: 'preference; liking' },
+    { jp: 'えいよう', en: 'nutrition; nutrients' },
+    { jp: 'けんこうてき', en: 'healthy; health-conscious' },
+    { jp: 'どくとく', en: 'unique; distinctive' },
+    { jp: 'けいけん', en: 'experience' },
+    { jp: 'こうこく', en: 'advertisement' },
+    { jp: 'ところ', en: 'place' },
+  ],
+  '16-1': [
+    { jp: 'にやにや', en: 'grin; smirk' },
+    { jp: 'おかえし', en: 'return gift; returning a favor' },
+    { jp: 'きにいる', en: 'to like; to be pleased with' },
+    { jp: 'そのかわり', en: 'in return; instead' },
+    { jp: 'せってい', en: 'settings; configuration' },
+    { jp: 'こういうの', en: 'something like this; this kind of thing' },
+    { jp: 'さっきから', en: 'since a little while ago; for some time now' },
+    { jp: 'いんさつ', en: 'printing; to print' },
+    { jp: 'ほめる', en: 'to praise; to compliment' },
+    { jp: 'ひっこし', en: 'moving (to a new home)' },
+    { jp: 'すいせんじょう', en: 'recommendation letter' },
+    { jp: 'つれていく', en: 'to take (someone) along; to bring' },
+    { jp: 'このあいだ', en: 'the other day' },
+    { jp: 'おおきさ', en: 'size' },
+    { jp: 'さとう', en: 'sugar' },
+  ],
+  '16-2': [
+    { jp: 'どうりょう', en: 'coworker; colleague' },
+    { jp: 'あいて', en: 'the other person; partner' },
+    { jp: 'かんけいせい', en: 'relationship' },
+    { jp: 'しょたいめん', en: 'first meeting; first time meeting' },
+    { jp: 'かのう', en: 'possible; feasible' },
+    { jp: 'つごう', en: 'convenience; circumstances; schedule' },
+    { jp: 'いっぽう', en: 'on the other hand; meanwhile' },
+    { jp: 'めいれい', en: 'order; command' },
+    { jp: 'そんけい', en: 'respect' },
+    { jp: 'ふつう', en: 'normal; ordinary; usual' },
+    { jp: 'たのむ', en: 'to ask; to request; to order' },
+    { jp: 'たずねる', en: 'to ask; to inquire' },
+    { jp: 'ホストファミリー', en: 'host family' },
+    { jp: 'いちど', en: 'once; one time' },
+    { jp: 'ぶしょ', en: 'department (in a company, etc.)' },
+    { jp: 'やくす', en: 'to translate' },
+    { jp: '16－3', en: '#REF!' },
+    { jp: 'きんえんしつ', en: 'non-smoking room' },
+    { jp: 'うりきれ', en: 'sold out' },
+    { jp: 'ねがう', en: 'to wish; to hope' },
+    { jp: 'きぼう', en: 'hope' },
+    { jp: 'だいがくいん', en: 'graduate school' },
+    { jp: 'しょうがくきん', en: 'scholarship' },
+    { jp: 'たまる', en: 'to accumulate; to be saved up' },
+    { jp: 'しょくば', en: 'workplace' },
+    { jp: 'きまつしけん', en: 'final exam' },
+    { jp: 'けいご', en: 'honorific language; polite speech' },
+    { jp: 'だれか', en: 'someone; somebody' },
+    { jp: 'あたる', en: 'to win (a prize); to be hit; to be correct' },
+  ],
+  '16-4': [
+    { jp: 'じょうきょう', en: 'situation; circumstances' },
+    { jp: 'タイミング', en: 'timing' },
+    { jp: 'ながれ', en: 'flow; sequence; process' },
+    { jp: 'じゅんじょ', en: 'order; sequence' },
+    { jp: 'こんどうする', en: 'to confuse; to mix up' },
+    { jp: 'できごと', en: 'event; incident' },
+    { jp: 'にている', en: 'similar; resembling' },
+    { jp: 'みかける', en: 'to see; to notice; to come across' },
+    { jp: 'のこる', en: 'to remain; to be left' },
+    { jp: 'りょこうさき', en: 'travel destination' },
+    { jp: 'おちこむ', en: 'to get depressed' },
+  ],
+  '16-5': [
+    { jp: 'あやまる', en: 'to apologize' },
+    { jp: 'たいおう', en: 'response; handling' },
+    { jp: 'おくれる', en: 'to be late' },
+    { jp: 'へんじ', en: 'reply' },
+    { jp: 'きにする', en: 'to worry about; to mind' },
+    { jp: 'こぼす', en: 'to spill' },
+    { jp: 'うごかす', en: 'to move (something); to shift' },
+    { jp: 'キャンセルする', en: 'to cancel' },
+    { jp: 'ずれる', en: 'to be off; to be out of alignment' },
+    { jp: '１しゅうかん', en: 'one week' },
+    { jp: 'またせる', en: 'to make someone wait' },
+    { jp: 'ミスをする', en: 'to make a mistake' },
+  ],
+  '17-1': [
+    { jp: 'おんせんち', en: 'hot spring resort; hot spring area' },
+    { jp: 'ざんぎょう', en: 'overtime work' },
+    { jp: 'せつぞく', en: 'connection; linking' },
+    { jp: 'さいこうきおん', en: 'highest temperature' },
+    { jp: 'ぶっか', en: 'prices; cost of living' },
+    { jp: 'じしん', en: 'earthquake' },
+    { jp: 'けしき', en: 'scenery; landscape' },
+    { jp: 'ぶんまつ', en: 'sentence ending; end of a sentence' },
+    { jp: 'ミス', en: 'mistake; error' },
+    { jp: 'きびしい', en: 'strict; harsh; tough' },
+    { jp: 'じこかんり', en: 'self-management; self-discipline' },
+    { jp: 'リモートワーク', en: 'remote work' },
+    { jp: 'いどう', en: 'movement; travel; transfer' },
+    { jp: 'やくそく', en: 'promise; appointment' },
+    { jp: 'うまれる', en: 'to be born' },
+    { jp: 'しゅしょう', en: 'prime minister' },
+    { jp: 'サラリーマン', en: 'salaryman; company employee' },
+  ],
+  '17-2': [
+    { jp: 'ひじょうに', en: 'very; extremely' },
+    { jp: 'しかも', en: 'moreover; on top of that' },
+    { jp: 'てんきよほう', en: 'weather forecast' },
+    { jp: 'SNS', en: 'social media' },
+    { jp: 'はれる', en: 'to become sunny' },
+    { jp: 'ざいたく', en: 'working from home' },
+    { jp: 'おどろき', en: 'surprise; shock' },
+    { jp: 'たからくじ', en: 'lottery' },
+    { jp: 'かじ', en: 'fire' },
+    { jp: 'したしい', en: 'close; intimate' },
+    { jp: 'でんぶん', en: 'hearsay / reported information' },
+    { jp: 'ニュアンス', en: 'nuance' },
+    { jp: 'いんよう', en: 'quotation; citation' },
+  ],
+  '17-3': [
+    { jp: 'りょうり', en: 'cooking; cuisine' },
+    { jp: 'しんこく', en: 'serious; grave' },
+    { jp: 'コンサート', en: 'concert' },
+    { jp: 'ぶんみゃく', en: 'context' },
+    { jp: 'しゅるい', en: 'type; kind' },
+    { jp: 'そうぞうする', en: 'to imagine' },
+    { jp: 'ひみつ', en: 'secret' },
+    { jp: 'コンタクト', en: 'contact lenses' },
+    { jp: 'ヒーター', en: 'heater' },
+    { jp: 'きゅうりょう', en: 'salary' },
+    { jp: 'かてい', en: 'assumption' },
+    { jp: 'いちにちじゅう', en: 'all day long' },
+    { jp: 'とり', en: 'bird' },
+    { jp: 'とびまわる', en: 'to fly around' },
+    { jp: 'せかい', en: 'world' },
+    { jp: 'テニス', en: 'tennis' },
+  ],
+  '17-4': [
+    { jp: 'りょうかい', en: 'understood; roger' },
+    { jp: 'いやだ', en: 'I don’t like it; I hate it' },
+    { jp: 'むかえる', en: 'to welcome; to receive' },
+    { jp: 'かのうせい', en: 'possibility' },
+    { jp: 'つづける', en: 'to continue' },
+    { jp: 'ちょうじかん', en: 'long hours; long time' },
+    { jp: 'こうりつ', en: 'efficiency' },
+    { jp: 'おきかえる', en: 'to replace; to substitute' },
+    { jp: 'りょう', en: 'dormitory' },
+    { jp: 'はんたい', en: 'opposition' },
+    { jp: 'ぎむ', en: 'duty; obligation' },
+    { jp: 'ひびき', en: 'sound; impression (of a word)' },
+    { jp: 'しょうりゃく', en: 'omission' },
+    { jp: 'せんたくし', en: 'option; choice' },
+    { jp: 'ひつようせい', en: 'necessity' },
+  ],
+  '17-5': [
+    { jp: 'てんない', en: 'inside the store; inside' },
+    { jp: 'かんさつする', en: 'to observe' },
+    { jp: 'なにも', en: 'nothing' },
+    { jp: 'あっち', en: 'over there; that way' },
+    { jp: 'ひょうげんする', en: 'to express' },
+    { jp: 'すいそくする', en: 'to infer; to guess' },
+    { jp: 'だいぶ', en: 'quite; fairly; considerably' },
+    { jp: 'じこ', en: 'accident' },
+    { jp: 'にる', en: 'to resemble; to be similar' },
+    { jp: 'おいしそう', en: 'looks delicious' },
+    { jp: 'がいけん', en: 'appearance' },
+    { jp: 'ちょくせつ', en: 'directly' },
+    { jp: 'はんだんする', en: 'to judge' },
+    { jp: 'じぶんじしん', en: 'oneself' },
+    { jp: 'スイーツ', en: 'sweets; dessert' },
+    { jp: 'ショーケース', en: 'showcase' },
+    { jp: 'バー', en: 'bar' },
+    { jp: 'すく', en: 'to become empty; to be available' },
+    { jp: 'ぎょうれつ', en: 'line; queue' },
+  ],
+  '17-6': [
+    { jp: 'あずける', en: 'to leave (something) with; to deposit' },
+    { jp: 'じょうえいじかん', en: 'showtime; screening time' },
+    { jp: 'ふあん', en: 'anxiety; uneasiness' },
+    { jp: 'けつだんする', en: 'to decide; to make a decision' },
+    { jp: 'めがさめる', en: 'to wake up' },
+    { jp: 'チェックする', en: 'to check' },
+    { jp: 'おにぎり', en: 'rice ball/onigiri' },
+    { jp: 'のみもの', en: 'drink/beverages' },
+    { jp: 'ビザ', en: 'visa' },
+    { jp: 'アカウント', en: 'account' },
+    { jp: 'アプリ', en: 'app' },
+    { jp: 'はじめる', en: 'to start' },
+    { jp: 'スケジュール', en: 'schedule' },
+    { jp: 'チェックイン', en: 'check-in' },
+    { jp: 'ゆうごはん', en: 'dinner' },
+  ],
+  '18-1': [
+    { jp: 'あるある', en: 'that happens; relatable' },
+    { jp: 'われる／わる', en: 'to break (intransitive); to break (transitive)' },
+    { jp: 'おゆ', en: 'hot water' },
+    { jp: 'ことなる', en: 'to differ' },
+    { jp: 'わかす／わく', en: 'to boil (something); to boil' },
+    { jp: 'きづく', en: 'to notice; to realize' },
+    { jp: 'ためる／たまる', en: 'to save up; to accumulate' },
+    { jp: 'いしきする', en: 'to be aware of; to be conscious of' },
+    { jp: 'さす', en: 'to point; to indicate' },
+    { jp: 'おもちゃ', en: 'toy' },
+    { jp: 'かつどう', en: 'activity' },
+    { jp: 'ふくろ', en: 'bag' },
+    { jp: 'じめん', en: 'ground' },
+    { jp: 'けっこん', en: 'marriage; getting married' },
+  ],
+  '18-2': [
+    { jp: 'なくす', en: 'to lose (something)' },
+    { jp: 'ざんねん', en: 'regretful; unfortunate; disappointing' },
+    { jp: 'いし', en: 'will; intention; desire' },
+    { jp: 'えきいん', en: 'station staff' },
+    { jp: 'かんりょうする', en: 'to complete; to finish' },
+    { jp: 'うんてんしゅ', en: 'driver' },
+    { jp: 'おとす', en: 'to drop; to lose (something you\'re holding)' },
+    { jp: 'いと', en: 'intention; meaning; purpose' },
+    { jp: 'ころぶ', en: 'to fall down' },
+    { jp: 'むし', en: 'insect' },
+    { jp: 'ばんごはん', en: 'dinner' },
+    { jp: 'パスポート', en: 'passport' },
+    { jp: 'やりおえる', en: 'to finish doing' },
+    { jp: 'こうかいする', en: 'to regret' },
+    { jp: 'いとする', en: 'to intend' },
+    { jp: 'はなしことば', en: 'spoken language' },
+    { jp: 'ドキドキする', en: 'to feel nervous; heart pounding' },
+  ],
+  '18-3': [
+    { jp: 'おつり', en: 'change (money)' },
+    { jp: 'ぎゃくに', en: 'conversely; on the contrary' },
+    { jp: 'さめる', en: 'to wake up' },
+    { jp: 'だんぼう', en: 'heating' },
+    { jp: 'さく', en: 'to bloom' },
+    { jp: 'じじつ', en: 'fact' },
+    { jp: 'マスターする', en: 'to master' },
+    { jp: 'きぶん', en: 'mood' },
+    { jp: 'あせ', en: 'sweat' },
+    { jp: 'タイプ', en: 'type' },
+    { jp: 'もどる', en: 'to return; to come back' },
+    { jp: 'ドア', en: 'door' },
+    { jp: 'おす', en: 'to push' },
+    { jp: 'かがくてき', en: 'scientific' },
+    { jp: 'スイッチ', en: 'switch' },
+    { jp: 'あいず', en: 'signal' },
+    { jp: 'ぶん', en: 'sentence' },
+    { jp: 'じけいれつ', en: 'chronological order' },
+    { jp: 'おなかがすく', en: 'to get hungry' },
+  ],
+  '18-4': [
+    { jp: 'ひとばんじゅう', en: 'all night long' },
+    { jp: 'にっこうよく', en: 'sunbathing' },
+    { jp: 'みらい', en: 'future' },
+    { jp: 'しょうらい', en: 'future (prospects)' },
+    { jp: 'どうじ', en: 'simultaneously; at the same time' },
+    { jp: 'ゆうひ', en: 'sunset; setting sun' },
+    { jp: 'しめす', en: 'to show; to indicate' },
+    { jp: 'めいそうする', en: 'to meditate' },
+    { jp: 'れいぞうこ', en: 'refrigerator' },
+    { jp: 'のばす', en: 'to stretch; to extend' },
+    { jp: 'おこる', en: 'to occur; to happen' },
+    { jp: 'メモする', en: 'to take notes; to jot down' },
+    { jp: 'あさひ', en: 'morning sun; sunrise' },
+    { jp: 'けづくろい', en: 'grooming (oneself)' },
+    { jp: 'かわかす', en: 'to dry' },
+  ],
+  '18-5': [
+    { jp: 'ちょきんする', en: 'to save money' },
+    { jp: 'まける', en: 'to lose' },
+    { jp: 'えあこん', en: 'air conditioner' },
+    { jp: 'ぎりぎり', en: 'just in time, barely' },
+    { jp: 'はんせい', en: 'self-reflection' },
+    { jp: 'ふりかえる', en: 'to look back, to reflect' },
+    { jp: 'こうかい', en: 'regret' },
+    { jp: 'かこ', en: 'past' },
+    { jp: 'ちょきん', en: 'savings' },
+    { jp: 'かたづける', en: 'to tidy up, to clean up' },
+    { jp: 'じぜん', en: 'in advance, beforehand' },
+    { jp: 'かいじょう', en: 'opening of a venue' },
+    { jp: 'あんなに', en: 'that much, so much' },
+    { jp: 'わかれる', en: 'to break up, to part' },
+    { jp: 'たす', en: 'to add' },
+    { jp: 'へんぴんする', en: 'to return (merchandise)' },
+  ],
+  '19-1': [
+    { jp: 'あつまる', en: 'to gather; to assemble' },
+    { jp: 'かんがえる', en: 'to think; to consider' },
+    { jp: 'とりひきさき', en: 'business partner; client company' },
+    { jp: 'やりがい', en: 'sense of fulfillment; rewarding feeling' },
+    { jp: 'いぜん', en: 'before; previously' },
+    { jp: 'さきほど', en: 'a little while ago' },
+    { jp: 'けいかく', en: 'plan' },
+    { jp: 'おくさま', en: 'wife (polite)' },
+    { jp: 'リスペクトする', en: 'to respect' },
+    { jp: 'まっちゃ', en: 'matcha' },
+    { jp: 'しんぶん', en: 'newspaper' },
+    { jp: 'しゃちょうしつ', en: 'president\'s office' },
+    { jp: 'りょうしん', en: 'parents' },
+    { jp: 'しはらう', en: 'to pay' },
+    { jp: 'ちゅうもんする', en: 'to order' },
+    { jp: 'さくぶん', en: 'essay; composition' },
+  ],
+  '19-2': [
+    { jp: 'あしもと', en: 'footing; one\'s step' },
+    { jp: 'パンフレット', en: 'pamphlet; brochure' },
+    { jp: 'たたみ', en: 'tatami mat' },
+    { jp: 'じゅうしょ', en: 'address' },
+    { jp: 'まんじゅう', en: 'steamed bun (Japanese sweet)' },
+    { jp: 'せいりけん', en: 'numbered ticket; queue ticket' },
+    { jp: 'アナウンス', en: 'announcement' },
+    { jp: 'スリッパ', en: 'slippers' },
+    { jp: 'だんさ', en: 'step; level difference' },
+    { jp: 'つかいわける', en: 'proper use; distinction' },
+    { jp: 'わすれもの', en: 'lost item; forgotten item' },
+    { jp: 'しょうしょう', en: 'a moment; a little while' },
+    { jp: 'うながす', en: 'to prompt; to urge' },
+    { jp: 'りえき', en: 'profit; benefit' },
+  ],
+  '19-3': [
+    { jp: 'なやみ', en: 'worry; trouble; concern' },
+    { jp: 'まとめる', en: 'to summarize; to put together' },
+    { jp: 'つきあう', en: 'to associate with; to go out with; to keep company' },
+    { jp: 'たくさん', en: 'a lot; many; much' },
+    { jp: 'めうえ', en: 'superior; higher rank; senior' },
+    { jp: 'あける', en: 'open (a door); unwrap' },
+    { jp: 'すてる', en: 'throw away' },
+    { jp: 'こちらこそ', en: 'you too; likewise' },
+    { jp: 'かんしゃ', en: 'gratitude; thanks' },
+    { jp: 'へんしんする', en: 'to reply; to respond' },
+    { jp: 'しょるい', en: 'document; paperwork' },
+    { jp: 'こまる', en: 'to be troubled; to have a problem' },
+    { jp: 'ごちそうする', en: 'to treat; to invite' },
+    { jp: 'おととい', en: 'the day before yesterday' },
+    { jp: 'よそよそしい', en: 'distant; unfriendly' },
+    { jp: 'あいだがら', en: 'relationship' },
+  ],
+  '19-4': [
+    { jp: 'しゅうごうじかん', en: 'meeting time; gathering time' },
+    { jp: 'しりあう', en: 'to get to know; to become acquainted' },
+    { jp: 'じぜんに', en: 'in advance; beforehand' },
+    { jp: 'ひがい', en: 'damage; harm' },
+    { jp: 'わすれる', en: 'to forget' },
+    { jp: 'よごれる', en: 'to get dirty' },
+    { jp: 'えんりょする', en: 'to refrain; to hold back' },
+    { jp: 'ほんとうは', en: 'in fact; originally' },
+    { jp: 'たからもの', en: 'treasure; precious thing' },
+    { jp: 'じゃまする', en: 'disturb; hinder; get in the way' },
+    { jp: 'よごす', en: 'make dirty; stain' },
+    { jp: 'つきじいちば', en: 'Tsukiji Market' },
+    { jp: 'りょうほう', en: 'both' },
+    { jp: 'おすすめする', en: 'to recommend' },
+    { jp: 'がいこくじん', en: 'foreigner' },
+    { jp: 'ころ', en: 'time of; when' },
+    { jp: 'まんぞくする', en: 'to be satisfied' },
+    { jp: 'ふしぜん', en: 'unnatural' },
+  ],
+  '19-5': [
+    { jp: 'じしん', en: 'confidence; self-confidence' },
+    { jp: 'てんすう', en: 'score; points' },
+    { jp: 'ようじ', en: 'errand; business' },
+    { jp: 'れんらく', en: 'contact; message' },
+    { jp: 'プロ', en: 'professional; pro' },
+    { jp: 'じょうしき', en: 'common sense; general knowledge' },
+    { jp: 'レビュー', en: 'review' },
+    { jp: 'ひどい', en: 'terrible; awful; severe' },
+    { jp: 'とける', en: 'to be solvable; to be able to solve' },
+    { jp: 'かんこうする', en: 'to go sightseeing; to tour' },
+    { jp: 'ごうかくする', en: 'to pass; to succeed (e.g., an exam)' },
+    { jp: 'きじゅん', en: 'standard; criterion' },
+    { jp: 'もてる', en: 'to be popular' },
+    { jp: 'もとづく', en: 'to be based on' },
+    { jp: 'かくしん', en: 'confidence; conviction' },
+    { jp: 'どあい', en: 'degree; extent' },
+    { jp: 'きたいはずれ', en: 'disappointment; letdown' },
+    { jp: 'おれい', en: 'thanks; gratitude' },
+    { jp: 'よほう', en: 'forecast' },
+  ],
+  '20-1': [
+    { jp: 'まもなく', en: 'soon; shortly' },
+    { jp: 'いただく', en: 'to receive; to eat; to drink (humble)' },
+    { jp: 'めんせつ', en: 'interview' },
+    { jp: 'いたす', en: 'to do (humble)' },
+    { jp: 'さける', en: 'to avoid' },
+    { jp: 'よびだす', en: 'to call out; to summon' },
+    { jp: 'じしゃ', en: 'one\'s own company' },
+    { jp: 'うかがう', en: 'to visit; to ask (humble)' },
+    { jp: 'みうち', en: 'one\'s own group; insider' },
+    { jp: 'たいしょくする', en: 'to resign; to retire' },
+    { jp: 'まいる', en: 'to go; to come (humble)' },
+    { jp: 'ぞんじる', en: 'to know (humble)' },
+    { jp: 'けんじょうご', en: 'humble language; modest language' },
+    { jp: 'まがる', en: 'to turn' },
+    { jp: 'けいい', en: 'respect; esteem' },
+    { jp: 'まご', en: 'grandchild' },
+    { jp: 'もうす', en: 'to say; to be called (humble)' },
+    { jp: 'かかり', en: 'person in charge; staff member' },
+    { jp: 'ほしがる', en: 'to want (third person)' },
+    { jp: 'さいじょうきゅう', en: 'highest grade; supreme' },
+    { jp: 'がいぶ', en: 'external; outside' },
+    { jp: 'こんかい', en: 'this time' },
+  ],
+  '20-2': [
+    { jp: 'しゃちょう', en: 'company president' },
+    { jp: 'よろしい', en: 'good; all right (polite)' },
+    { jp: 'はいけんする', en: 'to see; to look at (humble)' },
+    { jp: 'たちば', en: 'position; standpoint' },
+    { jp: 'ふくざつ', en: 'complex; complicated' },
+    { jp: 'きねん', en: 'commemoration; memento' },
+    { jp: 'へりくだる', en: 'to humble oneself' },
+    { jp: 'さしあげる', en: 'to give (humble)' },
+    { jp: 'ふしぜんな', en: 'unnatural; awkward' },
+    { jp: 'きょうじゅ', en: 'professor' },
+    { jp: 'そつぎょう', en: 'graduation' },
+    { jp: 'けんきょ', en: 'modesty; humility' },
+    { jp: 'あんない', en: 'guidance; information' },
+    { jp: 'てがみ', en: 'letter' },
+    { jp: 'てりょうり', en: 'home cooking' },
+    { jp: 'けんきゅうしつ', en: 'laboratory' },
+  ],
+  '20-3': [
+    { jp: 'ナビ', en: 'navigation; GPS' },
+    { jp: 'むり', en: 'impossible; unreasonable' },
+    { jp: 'しんごう', en: 'traffic light; signal' },
+    { jp: 'せつめいしょ', en: 'manual; instruction book' },
+    { jp: 'どうぐ', en: 'tool' },
+    { jp: 'のみかい', en: 'drinking party' },
+    { jp: 'にげる', en: 'run away; escape' },
+    { jp: 'ひるね', en: 'nap' },
+    { jp: 'うそ', en: 'lie' },
+    { jp: 'めいわく', en: 'trouble; nuisance; inconvenience' },
+    { jp: 'せんもんようご', en: 'technical term; jargon' },
+    { jp: 'すいぞくかん', en: 'aquarium' },
+    { jp: 'にほんりょこう', en: 'trip to Japan' },
+    { jp: 'ぱんや', en: 'bakery' },
+    { jp: 'はじめて', en: 'for the first time' },
+    { jp: 'けしょう', en: 'makeup' },
+    { jp: 'ほんやくき', en: 'translation device; translator' },
+    { jp: 'ジャケット', en: 'jacket' },
+  ],
+  '20-4': [
+    { jp: 'しょうりゃくする', en: 'to omit; to abbreviate' },
+    { jp: 'たりる', en: 'to be enough; to suffice' },
+    { jp: 'ちょうきやすみ', en: 'long vacation' },
+    { jp: 'どっち', en: 'which one' },
+    { jp: 'てつだい', en: 'help; assistance' },
+    { jp: 'げんじつてき', en: 'realistic; practical' },
+    { jp: 'はなしあう', en: 'to discuss; to talk it over' },
+    { jp: 'ふくめる', en: 'to include' },
+    { jp: 'ほぞんする', en: 'to save; to store' },
+    { jp: 'こどもたち', en: 'children' },
+    { jp: 'しちゃくする', en: 'to try on (clothes)' },
+    { jp: 'ちょうせんする', en: 'to challenge; to try' },
+    { jp: 'うめこむ', en: 'to embed' },
+    { jp: 'とどく', en: 'to arrive; to be delivered' },
+    { jp: 'カジュアル', en: 'casual' },
+    { jp: 'かんちがいする', en: 'to misunderstand' },
+  ],
+  '20-5': [
+    { jp: 'わたる', en: 'to cross' },
+    { jp: 'いちば', en: 'market' },
+    { jp: 'しらかわごう', en: 'Shirakawa-go' },
+    { jp: 'そうそう', en: 'Exactly.; That\'s right.' },
+    { jp: 'むら', en: 'village' },
+    { jp: 'じんぶつ', en: 'person; character' },
+    { jp: 'しろ', en: 'castle' },
+    { jp: 'がくしゅうしゃ', en: 'learner; student' },
+    { jp: 'はくりょく', en: 'impact; power; impressive presence' },
+    { jp: 'いいなあ。', en: 'How nice!; That sounds great!' },
+    { jp: 'きんえん', en: 'no smoking' },
+    { jp: 'ものごと', en: 'things; matters' },
+    { jp: 'くずれる', en: 'to collapse; to fall apart' },
+    { jp: 'はし', en: 'bridge' },
+    { jp: 'ゆめ', en: 'dream' },
+    { jp: 'いっきに', en: 'all at once' },
+    { jp: 'れんらくあぷり', en: 'messaging app; communication app' },
+    { jp: 'じんじゃ', en: 'shrine' },
+    { jp: 'とし', en: 'city' },
+    { jp: 'なりたつ', en: 'to make sense; to be valid' },
+    { jp: 'かざん', en: 'volcano' },
+  ],
+  '20-6': [
+    { jp: 'きゃっかんてき', en: 'objective' },
+    { jp: 'など', en: 'etc.; and so on' },
+    { jp: 'ぶつりてき', en: 'physical' },
+    { jp: 'ぐたいてき', en: 'specifically; concretely' },
+    { jp: 'しんりてき', en: 'psychological; mental' },
+    { jp: 'がくじゅつてき', en: 'academic; scholarly' },
+    { jp: 'われる', en: 'to break; to crack (intransitive)' },
+    { jp: 'ちょうせいする', en: 'to adjust; to coordinate' },
+    { jp: 'きんちょうする', en: 'to get nervous' },
+    { jp: 'なめらか', en: 'smooth' },
+    { jp: 'でこぼこ', en: 'uneven; bumpy' },
+    { jp: 'むく', en: 'to peel' },
+    { jp: 'ちょうどいい', en: 'just right; perfect' },
+    { jp: 'ふれる', en: 'to touch' },
+    { jp: 'もじ', en: 'letter; character' },
+    { jp: 'つたわる', en: 'to be conveyed; to get across' },
+    { jp: 'ポケット', en: 'pocket' },
+    { jp: 'かくすう', en: 'number of strokes' },
+    { jp: 'かえる', en: 'to change' },
+    { jp: 'きもの', en: 'kimono' },
+    { jp: 'さ', en: 'difference; gap' },
+    { jp: 'ちしき', en: 'knowledge' },
+    { jp: 'しんり', en: 'psychology; mental state' },
+    { jp: 'しょうてん', en: 'focus; focal point' },
+    { jp: 'かんきょう', en: 'environment' },
+  ],
+  '21-1': [
+    { jp: 'びしょびしょ', en: 'soaking wet' },
+    { jp: 'おこる', en: 'get angry; be upset; occur' },
+    { jp: 'ふむ', en: 'step on; tread' },
+    { jp: 'いじめる', en: 'bully' },
+    { jp: 'たてる', en: 'build; put up' },
+    { jp: 'とめる', en: 'stop; turn off; park (a car)' },
+    { jp: 'あいする', en: 'love; cherish' },
+    { jp: 'なぐる', en: 'hit; punch' },
+    { jp: 'よぶ', en: 'call; invite' },
+    { jp: 'こわす', en: 'break (something)' },
+    { jp: 'ぬすむ', en: 'steal' },
+    { jp: 'つづく', en: 'continue; last' },
+    { jp: 'はんにん', en: 'criminal; culprit' },
+    { jp: 'かえりみち', en: 'way home' },
+    { jp: 'ねたばれ', en: 'spoiler (plot reveal)' },
+    { jp: 'もんく', en: 'complaint' },
+    { jp: 'せかいじゅう', en: 'all over the world; worldwide' },
+    { jp: 'けいさつ', en: 'police' },
+    { jp: 'か', en: 'mosquito' },
+    { jp: 'どろぼう', en: 'thief' },
+    { jp: 'ひがいしゃ', en: 'victim' },
+    { jp: 'しゅやく', en: 'main character; leading role' },
+    { jp: 'こと', en: 'things; matters' },
+    { jp: 'ばかにする', en: 'to insult; to make a fool of' },
+  ],
+  '21-2': [
+    { jp: 'てもと', en: 'at hand; near oneself' },
+    { jp: 'ポスター', en: 'poster' },
+    { jp: 'たな', en: 'shelf' },
+    { jp: 'ぬいぐるみ', en: 'stuffed animal; plush toy' },
+    { jp: 'かべ', en: 'wall' },
+    { jp: 'けいじばん', en: 'bulletin board; notice board' },
+    { jp: 'げんこう', en: 'manuscript; draft; script' },
+    { jp: 'ふくむ', en: 'to include; to contain' },
+    { jp: 'ごみばこ', en: 'trash can; garbage bin' },
+    { jp: 'せいふ', en: 'government' },
+    { jp: 'はる', en: 'to stick; to paste; to post' },
+    { jp: 'しまる', en: 'to close; to be closed (intransitive)' },
+    { jp: 'ぼうはん', en: 'crime prevention; security' },
+    { jp: 'ひやす', en: 'to chill; to cool' },
+    { jp: 'うつしだす', en: 'to project; to display' },
+    { jp: 'ありがたい', en: 'grateful; thankful; appreciated' },
+    { jp: 'こくばん', en: 'blackboard; chalkboard' },
+    { jp: 'かざる', en: 'to decorate; to display' },
+    { jp: 'これなら', en: 'if this is the case; with this' },
+  ],
+  '21-3': [
+    { jp: 'ちず', en: 'map' },
+    { jp: 'ふざいひょう', en: 'delivery notice (missed delivery slip)' },
+    { jp: 'たくはいびん', en: 'delivery; courier service' },
+    { jp: 'わる', en: 'to break; to crack (something)' },
+    { jp: 'あっというまに', en: 'in no time; in a flash' },
+    { jp: 'こっぷ', en: 'cup; glass' },
+    { jp: 'さいあく', en: 'the worst' },
+    { jp: 'るす', en: 'absence; being away' },
+    { jp: 'せーる', en: 'sale' },
+    { jp: 'まちあいしつ', en: 'waiting room' },
+    { jp: 'チャイム', en: 'chime; bell' },
+    { jp: 'しゅじゅつ', en: 'surgery; operation' },
+    { jp: 'おふろ', en: 'bath' },
+    { jp: 'うなずく', en: 'to nod' },
+    { jp: 'やすみじかん', en: 'break time; recess' },
+    { jp: 'なる', en: 'to ring; to sound' },
+    { jp: 'たいふう', en: 'typhoon' },
+    { jp: 'たつ', en: 'to pass (time); to elapse' },
+    { jp: 'かみなり', en: 'thunder; lightning' },
+  ],
+  '21-4': [
+    { jp: 'ひろい', en: 'wide; spacious' },
+    { jp: 'たもつ', en: 'to maintain; to keep' },
+    { jp: 'いじする', en: 'to maintain; to preserve' },
+    { jp: 'あかるい', en: 'bright' },
+    { jp: 'えらい', en: 'great; admirable' },
+    { jp: 'しゅうごうばしょ', en: 'meeting place; gathering place' },
+    { jp: 'のぞむ', en: 'to desire; to hope' },
+    { jp: 'キャラクター', en: 'character' },
+    { jp: 'ラーメン', en: 'ramen' },
+    { jp: 'ふきそく', en: 'irregular' },
+    { jp: 'でんき', en: 'electricity; light' },
+    { jp: 'レベル', en: 'level' },
+  ],
+  '21-5': [
+    { jp: 'あわてる', en: 'to panic; to be flustered' },
+    { jp: 'いつもどおり', en: 'as usual' },
+    { jp: 'じけん', en: 'incident' },
+    { jp: 'たいしょう', en: 'target; subject' },
+    { jp: 'ききとる', en: 'to hear; to catch (sound)' },
+    { jp: 'ほんばん', en: 'actual performance; real thing' },
+    { jp: 'かならず', en: 'definitely; without fail' },
+    { jp: 'おそれいりますが', en: 'I\'m sorry to trouble you (polite phrase)' },
+    { jp: 'じょうし', en: 'boss; superior' },
+    { jp: 'つかまる', en: 'to be caught; to be arrested' },
+    { jp: 'ようぼう', en: 'request; demand' },
+    { jp: 'はやくち', en: 'fast speech; speaking quickly' },
+    { jp: 'かって', en: 'without permission; selfishly' },
+    { jp: 'かける', en: 'to hang; to call; to spend' },
+    { jp: 'しんぱい', en: 'worry' },
+    { jp: 'スピード', en: 'speed' },
+    { jp: 'ならべかえる', en: 'to rearrange' },
+  ],
+  '22-1': [
+    { jp: 'かんしゃする', en: 'to thank; to be grateful' },
+    { jp: 'あとから', en: 'later; afterwards' },
+    { jp: 'きょかする', en: 'to permit; to allow' },
+    { jp: 'おもい', en: 'heavy' },
+    { jp: 'きょり', en: 'distance' },
+    { jp: 'じぶんで', en: 'by oneself; on one\'s own' },
+    { jp: 'いやな', en: 'unpleasant; disagreeable' },
+    { jp: 'せわをする', en: 'to take care of' },
+    { jp: 'たいいく', en: 'physical education; P.E.' },
+    { jp: 'ぶか', en: 'subordinate' },
+    { jp: 'やく', en: 'role' },
+
+/* Total: 103 chapters, 1567 words */
+    { jp: 'は', en: 'teeth' },
+    { jp: 'しつもん', en: 'question' },
+    { jp: 'しんじん', en: 'new employee' },
+    { jp: 'てんしょく', en: 'job change; changing jobs' },
+  ],
+  '22-2': [
+    { jp: 'しつれい', en: 'rude; impolite' },
+    { jp: 'めいれいする', en: 'to order; to command' },
+    { jp: 'しじする', en: 'to instruct; to direct' },
+    { jp: 'しじ', en: 'instruction; direction' },
+    { jp: 'うえからめせん', en: 'condescending attitude; talking down' },
+    { jp: 'もんげん', en: 'curfew' },
+    { jp: 'わがまま', en: 'selfish; self-centered' },
+    { jp: 'あとまわし', en: 'postponement; putting off' },
+    { jp: 'ちゅういする', en: 'to warn; to caution' },
+    { jp: 'ただしい', en: 'correct; right' },
+    { jp: 'ろうか', en: 'hallway; corridor' },
+    { jp: 'じゅく', en: 'cram school' },
+    { jp: 'せんぱい', en: 'senior member of a group' },
+    { jp: 'ひとりぐらし', en: 'living alone' },
+    { jp: 'ほうっておく', en: 'to leave alone; to neglect' },
+    { jp: 'しゅうでん', en: 'last train' },
+    { jp: 'もんだい', en: 'problem' },
+  ],
+  '22-3': [
+    { jp: 'せつぞくする', en: 'to connect' },
+    { jp: 'かど', en: 'corner' },
+    { jp: 'ほしょうする', en: 'to guarantee; to assure' },
+    { jp: 'せいげん', en: 'restriction; limit' },
+    { jp: 'かいしょうする', en: 'to resolve; to relieve' },
+    { jp: 'のぞく', en: 'to exclude; to remove' },
+    { jp: 'ぐうぜん', en: 'coincidence; by chance' },
+    { jp: 'アドバイス', en: 'advice' },
+    { jp: 'ちゅうし', en: 'cancellation; suspension' },
+    { jp: 'テラスせき', en: 'terrace seat' },
+    { jp: 'うけつけ', en: 'reception desk' },
+    { jp: 'ぺらぺら(な)', en: 'fluent' },
+    { jp: 'サポーター', en: 'supporter' },
+    { jp: 'こうてい', en: 'school yard' },
+    { jp: 'とうぜん', en: 'naturally; of course' },
+    { jp: 'じょげん', en: 'advice; suggestion' },
+    { jp: 'こうはん', en: 'latter half' },
+    { jp: 'がんぼう', en: 'desire; wish' },
+    { jp: 'じょうたつ', en: 'improvement; progress' },
+    { jp: 'ちょうし', en: 'condition; state' },
+  ],
+  '22-4': [
+    { jp: 'なんだか', en: 'somehow; for some reason' },
+    { jp: 'もくひょう', en: 'goal; objective' },
+    { jp: 'はずかしがりや', en: 'shy person' },
+    { jp: 'しゅうちゅう', en: 'concentration; focus' },
+    { jp: 'ふまん', en: 'dissatisfaction; discontent' },
+    { jp: 'かおいろ', en: 'complexion; facial color' },
+    { jp: 'ふでばこ', en: 'pencil case; pencil box' },
+    { jp: 'そんなことない', en: 'not at all; that\'s not true' },
+    { jp: 'つなぐ', en: 'to connect; to link' },
+    { jp: 'かんじょう', en: 'emotion; feeling' },
+    { jp: 'よそうがい', en: 'unexpected; contrary to expectation' },
+    { jp: 'てつやする', en: 'to stay up all night' },
+    { jp: 'めんきょ', en: 'license' },
+    { jp: 'しゅかんてき', en: 'habitual' },
+    { jp: 'はんする', en: 'to oppose; to go against' },
+    { jp: 'ちゅうりつてき', en: 'neutral' },
+    { jp: 'てきせつ', en: 'appropriate; suitable' },
+    { jp: 'はんそで', en: 'short sleeves' },
+    { jp: 'せいかい', en: 'correct answer' },
+  ],
+  '22-5': [
+    { jp: 'えがお', en: 'smile' },
+    { jp: 'くらす', en: 'to live; to make a living; to get by' },
+    { jp: 'むかし', en: 'long ago; old times' },
+    { jp: 'すむ', en: 'to be clear (weather/air); to become clear' },
+    { jp: 'いなか', en: 'countryside; rural area' },
+    { jp: 'だいひょうてき', en: 'representative; typical' },
+    { jp: 'かこむ', en: 'to surround; to encircle' },
+    { jp: 'にちじょう', en: 'everyday life; daily routine' },
+    { jp: 'とうめい', en: 'transparent; clear' },
+    { jp: 'おんせんりょこう', en: 'hot spring trip' },
+    { jp: 'りょうりにん', en: 'chef; cook' },
+    { jp: 'フォーマル', en: 'formal' },
+    { jp: 'くうき', en: 'air' },
+    { jp: 'くも', en: 'cloud' },
+    { jp: 'ふかい', en: 'deep' },
+    { jp: 'とおり', en: 'street; road' },
+    { jp: 'せいかつ', en: 'life; lifestyle' },
+  ],
+  '23-1': [
+    { jp: 'きょうせいする', en: 'to force; to compel' },
+    { jp: 'ならいごと', en: 'lessons; hobby class' },
+    { jp: 'パターン', en: 'pattern' },
+    { jp: 'きょうせい', en: 'coercion; forcing' },
+    { jp: 'れつ', en: 'line; row' },
+    { jp: 'てんちょう', en: 'store manager' },
+    { jp: 'もっとも', en: 'the most' },
+    { jp: 'はこ', en: 'box' },
+    { jp: 'さくせん', en: 'strategy; operation' },
+    { jp: 'なんかいも', en: 'many times; repeatedly' },
+    { jp: 'かんとく', en: 'director; supervisor' },
+    { jp: 'うけみ', en: 'passive voice' },
+    { jp: 'ピーマン', en: 'green pepper' },
+    { jp: 'やくにたつ', en: 'to be useful' },
+    { jp: 'ダイエット', en: 'diet' },
+    { jp: 'シーン', en: 'scene' },
+    { jp: 'ピアノ', en: 'piano' },
+    { jp: 'バイト', en: 'part-time job' },
+  ],
+  '23-2': [
+    { jp: 'もとめる', en: 'to seek; to request' },
+    { jp: 'あり', en: 'okay; acceptable; possible' },
+    { jp: 'がまんする', en: 'to endure; to put up with' },
+    { jp: 'きず', en: 'wound; injury; scratch' },
+    { jp: 'しっぱいする', en: 'to fail; to make a mistake' },
+    { jp: 'かかく', en: 'price' },
+    { jp: 'ちょうせん', en: 'challenge' },
+    { jp: 'わりびき', en: 'discount' },
+    { jp: 'ほんね', en: 'true feelings; real intention' },
+    { jp: 'あきらめる', en: 'to give up' },
+    { jp: 'かいがい', en: 'overseas' },
+    { jp: 'かいがいりょこう', en: 'overseas travel' },
+    { jp: 'ピクニック', en: 'picnic' },
+    { jp: 'ねだん', en: 'price; cost' },
+  ],
+  '23-3': [
+    { jp: 'あいさつする', en: 'to greet' },
+    { jp: 'ほんき', en: 'serious; earnest' },
+    { jp: 'じすいする', en: 'to cook for oneself' },
+    { jp: 'おせわになる', en: 'to receive help; to be indebted' },
+    { jp: 'けいぞく', en: 'continuation; continuing' },
+    { jp: 'けっていする', en: 'to decide; to determine' },
+    { jp: 'よさん', en: 'budget' },
+    { jp: 'べっそう', en: 'vacation home; villa' },
+    { jp: 'わるぐち', en: 'bad-mouthing; speaking ill of someone' },
+    { jp: 'カフェイン', en: 'caffeine' },
+    { jp: 'かくにんする', en: 'to confirm; to check' },
+  ],
+  '23-4': [
+    { jp: 'げんど', en: 'limit; bounds' },
+    { jp: 'やむ', en: 'to stop (rain, wind, etc.); to cease' },
+    { jp: 'きょくたん', en: 'extreme; extreme limit' },
+    { jp: 'しめきり', en: 'deadline; closing date' },
+    { jp: 'えいぎょうする', en: 'to be open for business; to operate' },
+    { jp: 'きげん', en: 'deadline; due date; time limit' },
+    { jp: 'おわらせる', en: 'to finish; to bring to an end' },
+    { jp: 'いっしゅん', en: 'moment; instant' },
+    { jp: 'ゆうしょうする', en: 'to win the championship' },
+    { jp: 'ごうかく', en: 'to pass' },
+    { jp: 'ていしゅつ', en: 'to submit' },
+    { jp: 'おなかいっぱい', en: 'full; stuffed' },
+  ],
+  '23-5': [
+    { jp: 'くふうする', en: 'to devise; to come up with (an idea)' },
+    { jp: 'のりきる', en: 'to get through; to make it through' },
+    { jp: 'むすびつく', en: 'to be connected; to be linked' },
+    { jp: 'モチベーション', en: 'motivation' },
+    { jp: 'くつした', en: 'socks' },
+    { jp: 'かいふくする', en: 'to recover' },
+    { jp: 'あつかう', en: 'to handle; to deal with' },
+    { jp: 'かきじゅん', en: 'stroke order' },
+    { jp: 'ログイン', en: 'to log in' },
+    { jp: 'きかい', en: 'machine' },
+    { jp: 'ストレス', en: 'stress' },
+    { jp: 'そだてる', en: 'to raise; to bring up' },
+    { jp: 'たこやき', en: 'takoyaki' },
+    { jp: '～ずつ', en: 'each; at a time' },
+  ],
+};
+
+
+        // ========================
+        // UTILITIES
+        // ========================
+
+        function hiraganaToRomaji(hiragana) {
+            const romajiMap = {
+                'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+                'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+                'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+                'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+                'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+                'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+                'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+                'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+                'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+                'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+                'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+                'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+                'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+                'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+                'わ': 'wa', 'ゐ': 'wi', 'ゑ': 'we', 'を': 'wo', 'ん': 'n',
+                'っ': ''
+            };
+
+            const smallYMap = {
+                'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+                'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+                'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+                'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+                'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+                'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+                'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+                'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+                'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+                'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+                'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+                'ふゃ': 'fya', 'ふゅ': 'fyu', 'ふょ': 'fyo'
+            };
+
+            let result = '';
+            for (let i = 0; i < hiragana.length; i++) {
+                const char = hiragana[i];
+                const nextChar = hiragana[i + 1];
+                const twoCharCombo = char + nextChar;
+
+                if (char === 'っ') {
+                    if (nextChar) {
+                        const nextRomaji = smallYMap[twoCharCombo] || romajiMap[nextChar] || nextChar;
+                        result += nextRomaji.charAt(0);
+                    }
+                } else if (smallYMap[twoCharCombo]) {
+                    result += smallYMap[twoCharCombo];
+                    i++;
+                } else {
+                    result += romajiMap[char] || char;
+                }
+            }
+            return result;
+        }
+
+        // ========================
+        // APP STATE
+        // ========================
+
+        let appState = {
+            currentChapter: null,
+            currentCardIndex: 0,
+            isFlipped: false,
+            mode: 'flashcard',
+            direction: 'jp-to-en',
+            showEn: true,
+            allCards: [],  // 全カード（常に保持）
+            cards: [],     // セッション用カード（フィルター済み）
+            progress: {},
+            streak: 0,
+            xp: 0,
+            lastStudyDate: null
+        };
+
+        // ========================
+        // INITIALIZATION
+        // ========================
+
+        function initCards() {
+            appState.allCards = [];  // 全カードを初期化
+            Object.entries(VOCABULARY_DATA).forEach(([chapterId, words]) => {
+                if (Array.isArray(words)) {
+                    words.forEach((word, idx) => {
+                        const cardId = `${chapterId}-${idx}`;
+                        let romaji = word.romaji || '';
+                        if (!romaji) {
+                            const chNum = chapterId.split('-')[0];
+                            if (parseInt(chNum) <= 12) {
+                                romaji = hiraganaToRomaji(word.jp);
+                            }
+                        }
+                        const card = {
+                            id: cardId,
+                            japanese: word.jp,
+                            english: word.en,
+                            romaji: romaji,
+                            chapter: chapterId
+                        };
+                        appState.allCards.push(card);  // allCards に追加
+                        if (!appState.progress[chapterId]) appState.progress[chapterId] = {};
+                        if (!appState.progress[chapterId][cardId]) {
+                            appState.progress[chapterId][cardId] = { state: 'new', correct: 0, again: 0 };
+                        }
+                    });
+                }
+            });
+            appState.cards = [...appState.allCards];  // 初期状態では全カード
+        }
+
+        function renderChapters() {
+            // Super Beginner - STEP1
+            const step1 = document.getElementById('superbegin-step1');
+            step1.innerHTML = '';
+            TEXTBOOK_STRUCTURE.superbegin.step1.forEach(item => {
+                step1.appendChild(createChapterCard(item, 'superbegin'));
+            });
+
+            // Super Beginner - STEP2
+            const step2 = document.getElementById('superbegin-step2');
+            step2.innerHTML = '';
+            TEXTBOOK_STRUCTURE.superbegin.step2.forEach(item => {
+                step2.appendChild(createChapterCard(item, 'superbegin'));
+            });
+
+            // Beginner Chapters with collapsible subsections
+            const beginnerGrid = document.getElementById('beginner-chapters');
+            beginnerGrid.innerHTML = '';
+            TEXTBOOK_STRUCTURE.beginner.chapters.forEach(ch => {
+                const container = document.createElement('div');
+                container.style.gridColumn = '1 / -1';
+                container.style.marginBottom = '1rem';
+
+                // Chapter title (clickable header)
+                const titleEl = document.createElement('div');
+                titleEl.className = 'accordion-header';
+                titleEl.style.fontWeight = '700';
+                titleEl.style.fontSize = '1.1rem';
+                titleEl.style.padding = '1rem';
+                titleEl.style.background = 'var(--accent)';
+                titleEl.style.color = '#fff';
+                titleEl.style.borderRadius = 'var(--radius-lg)';
+                titleEl.style.cursor = 'pointer';
+                titleEl.style.display = 'flex';
+                titleEl.style.justifyContent = 'space-between';
+                titleEl.style.alignItems = 'center';
+                titleEl.style.userSelect = 'none';
+                titleEl.innerHTML = `<span>${ch.name}</span><span style="font-size: 1.3rem;">▼</span>`;
+                container.appendChild(titleEl);
+
+                // Subsections grid (initially hidden)
+                const subsGrid = document.createElement('div');
+                subsGrid.className = 'accordion-content';
+                subsGrid.style.display = 'none';
+                subsGrid.style.display = 'grid';
+                subsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(150px, 1fr))';
+                subsGrid.style.gap = '0.8rem';
+                subsGrid.style.padding = '1rem';
+                subsGrid.style.background = 'var(--accent-soft)';
+                subsGrid.style.borderRadius = '0 0 var(--radius-lg) var(--radius-lg)';
+                subsGrid.style.maxHeight = '0px';
+                subsGrid.style.overflow = 'hidden';
+                subsGrid.style.transition = 'all 0.3s ease';
+
+                ch.subsections.forEach(subId => {
+                    const subCard = createSubsectionCard(subId);
+                    subsGrid.appendChild(subCard);
+                });
+
+                container.appendChild(subsGrid);
+
+                // Toggle functionality
+                let isOpen = false;
+                titleEl.addEventListener('click', () => {
+                    isOpen = !isOpen;
+                    if (isOpen) {
+                        subsGrid.style.display = 'grid';
+                        subsGrid.style.maxHeight = '1000px';
+                        titleEl.querySelector('span:last-child').textContent = '▲';
+                    } else {
+                        subsGrid.style.maxHeight = '0px';
+                        setTimeout(() => {
+                            subsGrid.style.display = 'none';
+                        }, 300);
+                        titleEl.querySelector('span:last-child').textContent = '▼';
+                    }
+                });
+
+                beginnerGrid.appendChild(container);
+            });
+
+            // Intermediate Chapters with collapsible subsections
+            const intermediateGrid = document.getElementById('intermediate-chapters');
+            intermediateGrid.innerHTML = '';
+            TEXTBOOK_STRUCTURE.intermediate.chapters.forEach(ch => {
+                const container = document.createElement('div');
+                container.style.gridColumn = '1 / -1';
+                container.style.marginBottom = '1rem';
+
+                const titleEl = document.createElement('div');
+                titleEl.className = 'accordion-header';
+                titleEl.style.fontWeight = '700';
+                titleEl.style.fontSize = '1.1rem';
+                titleEl.style.padding = '1rem';
+                titleEl.style.background = 'var(--accent)';
+                titleEl.style.color = '#fff';
+                titleEl.style.borderRadius = 'var(--radius-lg)';
+                titleEl.style.cursor = 'pointer';
+                titleEl.style.display = 'flex';
+                titleEl.style.justifyContent = 'space-between';
+                titleEl.style.alignItems = 'center';
+                titleEl.style.userSelect = 'none';
+                titleEl.innerHTML = `<span>${ch.name}</span><span style="font-size: 1.3rem;">▼</span>`;
+                container.appendChild(titleEl);
+
+                const subsGrid = document.createElement('div');
+                subsGrid.className = 'accordion-content';
+                subsGrid.style.display = 'none';
+                subsGrid.style.display = 'grid';
+                subsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(150px, 1fr))';
+                subsGrid.style.gap = '0.8rem';
+                subsGrid.style.padding = '1rem';
+                subsGrid.style.background = 'var(--accent-soft)';
+                subsGrid.style.borderRadius = '0 0 var(--radius-lg) var(--radius-lg)';
+                subsGrid.style.maxHeight = '0px';
+                subsGrid.style.overflow = 'hidden';
+                subsGrid.style.transition = 'all 0.3s ease';
+
+                ch.subsections.forEach(subId => {
+                    const subCard = createSubsectionCard(subId);
+                    subsGrid.appendChild(subCard);
+                });
+
+                container.appendChild(subsGrid);
+
+                let isOpen = false;
+                titleEl.addEventListener('click', () => {
+                    isOpen = !isOpen;
+                    if (isOpen) {
+                        subsGrid.style.display = 'grid';
+                        subsGrid.style.maxHeight = '1000px';
+                        titleEl.querySelector('span:last-child').textContent = '▲';
+                    } else {
+                        subsGrid.style.maxHeight = '0px';
+                        setTimeout(() => {
+                            subsGrid.style.display = 'none';
+                        }, 300);
+                        titleEl.querySelector('span:last-child').textContent = '▼';
+                    }
+                });
+
+                intermediateGrid.appendChild(container);
+            });
+        }
+
+        function createSubsectionCard(subsectionId) {
+            const cardsInSection = appState.allCards.filter(c => c.chapter === subsectionId);  // allCards を使用
+            const progress = appState.progress[subsectionId] || {};
+            const mastered = Object.values(progress).filter(p => p.state === 'mastered' || p.state === 'burned').length;
+            const percent = cardsInSection.length > 0 ? Math.round((mastered / cardsInSection.length) * 100) : 0;
+
+            const card = document.createElement('div');
+            card.className = 'chapter-card';
+            card.style.padding = '0.8rem';
+            card.style.minHeight = 'auto';
+            card.innerHTML = `
+                <div class="chapter-title" style="font-size: 0.95rem;">${subsectionId}</div>
+                ${cardsInSection.length > 0 ? `
+                    <div class="chapter-subtitle" style="font-size: 0.8rem;">${cardsInSection.length}語</div>
+                    <div class="chapter-progress" style="margin: 0.4rem 0;">
+                        <div class="chapter-progress-bar" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="chapter-stats" style="font-size: 0.75rem;">${mastered}/${cardsInSection.length}</div>
+                ` : '<div class="chapter-subtitle">No data</div>'}
+            `;
+
+            if (cardsInSection.length > 0) {
+                card.addEventListener('click', () => startStudy(subsectionId));
+                card.style.cursor = 'pointer';
+            }
+            return card;
+        }
+
+        function createChapterCard(chapter, section) {
+            const cardsInChapter = appState.cards.filter(c => c.chapter === chapter.id);
+            const progress = appState.progress[chapter.id] || {};
+            const mastered = Object.values(progress).filter(p => p.state === 'mastered' || p.state === 'burned').length;
+            const percent = cardsInChapter.length > 0 ? Math.round((mastered / cardsInChapter.length) * 100) : 0;
+
+            const card = document.createElement('div');
+            card.className = 'chapter-card';
+            card.innerHTML = `
+                <div class="chapter-title">${chapter.name}</div>
+                ${cardsInChapter.length > 0 ? `
+                    <div class="chapter-subtitle">${cardsInChapter.length} words</div>
+                    <div class="chapter-progress">
+                        <div class="chapter-progress-bar" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="chapter-stats">${mastered}/${cardsInChapter.length}</div>
+                ` : '<div class="chapter-subtitle">Data coming soon</div>'}
+            `;
+
+            if (cardsInChapter.length > 0) {
+                card.addEventListener('click', () => startStudy(chapter.id));
+            }
+            return card;
+        }
+
+        function startStudy(chapterId) {
+            appState.currentChapter = chapterId;
+            appState.cards = appState.allCards.filter(c => c.chapter === chapterId);  // allCards からフィルタリング
+            appState.currentCardIndex = 0;
+            appState.isFlipped = false;
+            switchView('study');
+            renderCard();
+        }
+
+        function switchView(name) {
+            console.log('switchView called with name:', name);
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const viewElement = document.getElementById(name);
+            console.log('viewElement:', viewElement, 'for name:', name);
+
+            if (viewElement) {
+                viewElement.classList.add('active');
+            } else {
+                console.error('View not found:', name);
+                return;
+            }
+
+            const navBtn = document.querySelector(`[data-view="${name}"]`);
+            if (navBtn) {
+                navBtn.classList.add('active');
+            }
+        }
+
+        function renderCard() {
+            if (appState.cards.length === 0) return;
+
+            const card = appState.cards[appState.currentCardIndex];
+            const progress = appState.progress[appState.currentChapter]?.[card.id] || { state: 'new' };
+            const badges = { 'new': '🆕 New', 'learning': '📚 Learning', 'mastered': '✓ Mastered', 'burned': '🔥 Burned' };
+            document.getElementById('card-badge').textContent = badges[progress.state] || '';
+
+            const chNum = parseInt(appState.currentChapter.split('-')[0]);
+            const isEarlyChapter = chNum <= 12;
+
+            // Front is always visible, back shows when flipped
+            document.getElementById('card-front').classList.add('active');
+            document.getElementById('card-back').classList.toggle('active', appState.isFlipped);
+
+            // Always show front (Japanese)
+            document.getElementById('card-label-front').textContent = 'Japanese / 日本語';
+            if (isEarlyChapter) {
+                document.getElementById('card-jp-front').textContent = card.japanese;
+                document.getElementById('card-romaji-front').textContent = card.romaji;
+                document.getElementById('card-en-front').textContent = '';
+                document.getElementById('card-en-front').style.display = 'none';
+            } else {
+                const text = appState.direction === 'jp-to-en' ? card.japanese : card.english;
+                const en = appState.direction === 'jp-to-en' && appState.showEn ? card.english : '';
+                document.getElementById('card-jp-front').textContent = text;
+                document.getElementById('card-romaji-front').textContent = card.romaji;
+                document.getElementById('card-en-front').textContent = en;
+                document.getElementById('card-en-front').style.display = '';
+            }
+
+            // Back shows English when flipped
+            document.getElementById('card-label-back').textContent = appState.direction === 'jp-to-en' ? 'English / 英語' : 'Japanese / 日本語';
+            const backText = appState.direction === 'jp-to-en' ? card.english : card.japanese;
+            document.getElementById('card-jp-back').textContent = backText;
+            document.getElementById('card-romaji-back').textContent = '';
+            document.getElementById('card-en-back').textContent = '';
+
+            const total = appState.cards.length;
+            const current = appState.currentCardIndex + 1;
+            document.getElementById('card-counter').textContent = `Card ${current} / カード ${current} of ${total}`;
+            const prog = Math.round((current / total) * 100);
+            document.getElementById('session-progress').style.width = prog + '%';
+            document.getElementById('session-progress-text').textContent = prog + '%';
+        }
+
+        function showCompletionScreen(mode) {
+            // 完了画面表示
+            console.log('showCompletionScreen called with mode:', mode);
+            switchView('completion');
+            console.log('switchView completed');
+
+            // セクション情報
+            const sectionCards = appState.cards.length;
+            document.getElementById('completion-subtitle').textContent = `${appState.currentChapter} セクション ${sectionCards} 問`;
+
+            // クイズモード時のスコア表示
+            if (mode === 'quiz') {
+                const correct = appState.cards.filter(c => {
+                    const prog = appState.progress[appState.currentChapter]?.[c.id];
+                    return prog && prog.correct > 0;
+                }).length;
+
+                document.getElementById('completion-score').style.display = 'block';
+                document.getElementById('completion-correct').textContent = correct;
+                document.getElementById('completion-total').textContent = sectionCards;
+
+                const percentage = Math.round((correct / sectionCards) * 100);
+                document.getElementById('completion-percentage').textContent = `${percentage}%`;
+
+                // スコア評価
+                let comment = 'まぁまぁ';
+                let color = '#D2A679';
+                if (percentage >= 80) {
+                    comment = 'すばらしい！';
+                    color = 'var(--ok)';
+                } else if (percentage >= 50) {
+                    comment = 'いいね';
+                    color = 'var(--accent)';
+                }
+                const commentEl = document.getElementById('completion-comment');
+                commentEl.textContent = comment;
+                commentEl.style.color = color;
+
+                // クイズモード時はクイズ関連ボタンは非表示
+                document.getElementById('completion-quiz-challenge').style.display = 'none';
+            } else {
+                // フラッシュカードモード時
+                document.getElementById('completion-score').style.display = 'none';
+                document.getElementById('completion-quiz-challenge').style.display = 'inline-block';
+            }
+
+            updateHeader();
+        }
+
+        function getNextSection() {
+            const chapters = appState.allCards.map(c => c.chapter);
+            const uniqueChapters = [...new Set(chapters)].sort((a, b) => {
+                const aNum = a.split('-').map(Number);
+                const bNum = b.split('-').map(Number);
+                if (aNum[0] !== bNum[0]) return aNum[0] - bNum[0];
+                return (aNum[1] || 0) - (bNum[1] || 0);
+            });
+
+            const currentIdx = uniqueChapters.indexOf(appState.currentChapter);
+            return currentIdx < uniqueChapters.length - 1 ? uniqueChapters[currentIdx + 1] : null;
+        }
+
+        function showCardMenu() {
+            const card = appState.cards[appState.currentCardIndex];
+            const menu = document.getElementById('card-menu');
+            menu.style.display = 'flex';
+            menu.style.zIndex = '1000';
+
+            document.getElementById('menu-again').onclick = () => {
+                updateCardState(card.id, 'again');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                menu.style.display = 'none';
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            };
+
+            document.getElementById('menu-hard').onclick = () => {
+                updateCardState(card.id, 'again');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                menu.style.display = 'none';
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            };
+
+            document.getElementById('menu-easy').onclick = () => {
+                updateCardState(card.id, 'good');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                menu.style.display = 'none';
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            };
+
+            document.getElementById('menu-close').onclick = () => {
+                menu.style.display = 'none';
+            };
+        }
+
+        function updateCardState(cardId, action) {
+            const prog = appState.progress[appState.currentChapter]?.[cardId];
+            if (!prog) return;
+            if (action === 'good') {
+                prog.correct++;
+                appState.xp += 10;
+                if (prog.state === 'new') prog.state = 'learning';
+                else if (prog.state === 'learning' && prog.correct >= 3) prog.state = 'mastered';
+                else if (prog.state === 'mastered' && prog.correct >= 6) prog.state = 'burned';
+            } else if (action === 'again') {
+                prog.again++;
+                appState.xp += 5;
+            }
+            updateHeader();
+        }
+
+        function renderQuiz() {
+            // セッション完了判定
+            if (appState.currentCardIndex >= appState.cards.length) {
+                showCompletionScreen('quiz');
+                return;
+            }
+
+            if (appState.cards.length === 0) return;
+            const card = appState.cards[appState.currentCardIndex];
+            const isJpQuestion = appState.direction === 'jp-to-en';
+            const question = isJpQuestion ? card.japanese : card.english;
+
+            document.getElementById('quiz-question').textContent = question;
+
+            // Generate 4 choices: 1 correct + 3 wrong
+            const allCards = appState.cards;
+            const wrongChoices = allCards.filter(c => c.id !== card.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const choices = [card, ...wrongChoices].sort(() => Math.random() - 0.5);
+
+            const choicesDiv = document.getElementById('quiz-choices');
+            choicesDiv.innerHTML = '';
+            choices.forEach((choice, idx) => {
+                const answer = isJpQuestion ? choice.english : choice.japanese;
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-primary';
+                btn.textContent = answer;
+                btn.addEventListener('click', () => checkQuizAnswer(choice.id === card.id, card.id));
+                choicesDiv.appendChild(btn);
+            });
+
+            const total = appState.cards.length;
+            const current = appState.currentCardIndex + 1;
+            document.getElementById('card-counter').textContent = `Quiz ${current} / クイズ ${current} of ${total}`;
+            const prog = Math.round((current / total) * 100);
+            document.getElementById('session-progress').style.width = prog + '%';
+            document.getElementById('session-progress-text').textContent = prog + '%';
+        }
+
+        function checkQuizAnswer(isCorrect, cardId) {
+            const feedbackDiv = document.getElementById('quiz-feedback');
+            const feedbackText = document.getElementById('feedback-text');
+
+            if (isCorrect) {
+                feedbackText.textContent = '✓ Correct! / 正解';
+                feedbackText.style.color = 'var(--ok)';
+                updateCardState(cardId, 'good');
+                playPingPong();
+            } else {
+                feedbackText.textContent = '✗ Incorrect / 不正解';
+                feedbackText.style.color = 'var(--wrong)';
+                updateCardState(cardId, 'again');
+            }
+
+            feedbackDiv.style.display = 'block';
+            document.getElementById('quiz-choices').style.display = 'none';
+        }
+
+        function playPingPong() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                // First note (800Hz)
+                const osc1 = audioContext.createOscillator();
+                const gain1 = audioContext.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioContext.destination);
+                osc1.frequency.value = 800;
+                osc1.type = 'sine';
+                gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                osc1.start(audioContext.currentTime);
+                osc1.stop(audioContext.currentTime + 0.1);
+
+                // Second note (1200Hz) - slightly delayed
+                const osc2 = audioContext.createOscillator();
+                const gain2 = audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                osc2.frequency.value = 1200;
+                osc2.type = 'sine';
+                gain2.gain.setValueAtTime(0.3, audioContext.currentTime + 0.12);
+                gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.22);
+                osc2.start(audioContext.currentTime + 0.12);
+                osc2.stop(audioContext.currentTime + 0.22);
+            } catch (e) {
+                console.log('Audio not available');
+            }
+        }
+
+        function updateHeader() {
+            document.getElementById('streak-display').textContent = appState.streak;
+            document.getElementById('xp-display').textContent = appState.xp;
+            const totalCards = Object.values(VOCABULARY_DATA).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+            document.getElementById('total-cards-display').textContent = totalCards;
+        }
+
+        // ========================
+        // EVENT LISTENERS
+        // ========================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCards();
+            renderChapters();
+            updateHeader();
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchView(btn.dataset.view));
+            });
+
+            document.getElementById('show-en-toggle').addEventListener('change', (e) => {
+                appState.showEn = e.target.checked;
+                renderCard();
+            });
+
+            let cardTouchStart = 0;
+            const flashcard = document.getElementById('flashcard');
+
+            flashcard.addEventListener('mousedown', () => {
+                cardTouchStart = Date.now();
+            });
+
+            flashcard.addEventListener('click', () => {
+                const holdTime = Date.now() - cardTouchStart;
+                const isLongPress = holdTime > 500;
+
+                if (isLongPress) {
+                    showCardMenu();
+                    return;
+                }
+
+                flashcard.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    flashcard.style.transform = 'scale(1)';
+
+                    if (appState.isFlipped) {
+                        const card = appState.cards[appState.currentCardIndex];
+                        updateCardState(card.id, 'good');
+                        appState.currentCardIndex++;
+                        appState.isFlipped = false;
+                        if (appState.currentCardIndex >= appState.cards.length) {
+                            showCompletionScreen('flashcard');
+                        } else {
+                            renderCard();
+                        }
+                    } else {
+                        appState.isFlipped = true;
+                        renderCard();
+                    }
+                }, 100);
+            });
+
+            document.getElementById('back-btn').addEventListener('click', () => switchView('home'));
+
+            document.getElementById('btn-good').addEventListener('click', () => {
+                const card = appState.cards[appState.currentCardIndex];
+                updateCardState(card.id, 'good');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            });
+
+            document.getElementById('btn-again').addEventListener('click', () => {
+                const card = appState.cards[appState.currentCardIndex];
+                updateCardState(card.id, 'again');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            });
+
+            document.getElementById('btn-hard').addEventListener('click', () => {
+                const card = appState.cards[appState.currentCardIndex];
+                updateCardState(card.id, 'again');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            });
+
+            document.getElementById('btn-easy').addEventListener('click', () => {
+                const card = appState.cards[appState.currentCardIndex];
+                updateCardState(card.id, 'good');
+                appState.currentCardIndex++;
+                appState.isFlipped = false;
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    showCompletionScreen('flashcard');
+                } else {
+                    renderCard();
+                }
+            });
+
+            document.getElementById('btn-next-quiz').addEventListener('click', () => {
+                console.log('btn-next-quiz clicked, currentCardIndex before:', appState.currentCardIndex, 'cards.length:', appState.cards.length);
+                appState.currentCardIndex++;
+                console.log('currentCardIndex after increment:', appState.currentCardIndex);
+                document.getElementById('quiz-feedback').style.display = 'none';
+                document.getElementById('quiz-choices').style.display = 'grid';
+                if (appState.currentCardIndex >= appState.cards.length) {
+                    console.log('Calling showCompletionScreen');
+                    showCompletionScreen('quiz');
+                } else {
+                    console.log('Calling renderQuiz');
+                    renderQuiz();
+                }
+            });
+
+            document.getElementById('mode-toggle').addEventListener('click', () => {
+                appState.mode = appState.mode === 'flashcard' ? 'quiz' : 'flashcard';
+                document.getElementById('mode-toggle').textContent = `Mode: ${appState.mode === 'flashcard' ? 'Flashcard / フラッシュカード' : 'Quiz / クイズ'}`;
+                appState.currentCardIndex = 0;
+                appState.isFlipped = false;
+                const flashcardContainer = document.getElementById('flashcard');
+                const flashcardControls = document.getElementById('flashcard-controls');
+                const quizSection = document.getElementById('quiz-section');
+                if (appState.mode === 'quiz') {
+                    flashcardContainer.style.display = 'none';
+                    flashcardControls.style.display = 'none';
+                    quizSection.style.display = 'block';
+                    renderQuiz();
+                } else {
+                    flashcardContainer.style.display = 'flex';
+                    flashcardControls.style.display = 'flex';
+                    quizSection.style.display = 'none';
+                    renderCard();
+                }
+            });
+
+            document.getElementById('direction-toggle').addEventListener('click', () => {
+                appState.direction = appState.direction === 'jp-to-en' ? 'en-to-jp' : 'jp-to-en';
+                document.getElementById('direction-toggle').textContent = `Direction / 方向: ${appState.direction === 'jp-to-en' ? 'JP→EN' : 'EN→JP'}`;
+                appState.isFlipped = false;
+                if (appState.mode === 'flashcard') {
+                    renderCard();
+                } else {
+                    renderQuiz();
+                }
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                if (confirm('Reset all progress? / 全ての進捗をリセットしますか？')) {
+                    appState.progress = {};
+                    appState.xp = 0;
+                    appState.streak = 0;
+                    initCards();
+                    updateHeader();
+                }
+            });
+
+            // 完了画面のボタン
+            document.getElementById('completion-retry').addEventListener('click', () => {
+                appState.currentCardIndex = 0;
+                appState.isFlipped = false;
+                if (appState.mode === 'flashcard') {
+                    appState.cards = appState.allCards.filter(c => c.chapter === appState.currentChapter);
+                    switchView('study');
+                    renderCard();
+                } else {
+                    appState.cards = appState.allCards.filter(c => c.chapter === appState.currentChapter);
+                    switchView('study');
+                    renderQuiz();
+                }
+            });
+
+            document.getElementById('completion-next').addEventListener('click', () => {
+                const nextSection = getNextSection();
+                if (nextSection) {
+                    startStudy(nextSection);
+                } else {
+                    alert('最後のセクションです！');
+                    switchView('home');
+                }
+            });
+
+            document.getElementById('completion-quiz-challenge').addEventListener('click', () => {
+                appState.mode = 'quiz';
+                appState.currentCardIndex = 0;
+                appState.isFlipped = false;
+                appState.cards = appState.allCards.filter(c => c.chapter === appState.currentChapter);
+                document.getElementById('mode-toggle').textContent = 'Mode: Quiz / クイズ';
+                switchView('study');
+                renderQuiz();
+            });
+
+            document.getElementById('completion-back').addEventListener('click', () => {
+                switchView('home');
+            });
+
+            document.getElementById('setting-sound').addEventListener('change', (e) => {
+                // Sound settings can be extended later
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (document.getElementById('study').classList.contains('active')) {
+                    if (e.code === 'Space') { e.preventDefault(); document.getElementById('flashcard').click(); }
+                    if (e.code === 'ArrowRight') { e.preventDefault(); document.getElementById('btn-good').click(); }
+                    if (e.code === 'ArrowLeft') { e.preventDefault(); document.getElementById('btn-again').click(); }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
