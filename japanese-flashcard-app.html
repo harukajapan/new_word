@@ -390,7 +390,7 @@
             2: ['2-1', '2-2', '2-3'],
             3: ['3-1', '3-2', '3-3', '3-4', '3-6'],
             4: ['4-1', '4-2', '4-3', '4-5'],
-            5: ['5-2', '5-3'],
+            5: ['5-1', '5-2', '5-3'],
             6: ['6-1', '6-2', '6-3', '6-4'],
             7: ['7-1', '7-2', '7-4'],
             8: ['8-1', '8-2', '8-3', '8-4'],
@@ -401,7 +401,7 @@
             13: ['13-1', '13-2', '13-3', '13-4', '13-5', '13-6'],
             14: ['14-1', '14-2', '14-3', '14-4', '14-5'],
             15: ['15-1', '15-2', '15-3', '15-4'],
-            16: ['16-1', '16-2', '16-4', '16-5'],
+            16: ['16-1', '16-2', '16-3', '16-4', '16-5'],
             17: ['17-1', '17-2', '17-3', '17-4', '17-5', '17-6'],
             18: ['18-1', '18-2', '18-3', '18-4', '18-5'],
             19: ['19-1', '19-2', '19-3', '19-4', '19-5'],
@@ -816,7 +816,8 @@
     { jp: 'ゲーム', en: 'game' },
     { jp: 'ごはん', en: 'rice; meal' },
     { jp: 'パン', en: 'bread' },
-    { jp: '5－1', en: '#REF!' },
+  ],
+  '5-1': [
     { jp: 'つよい', en: 'strong' },
     { jp: 'たのしい', en: 'fun; enjoyable' },
     { jp: 'いい', en: 'good' },
@@ -1484,7 +1485,8 @@
     { jp: 'いちど', en: 'once; one time' },
     { jp: 'ぶしょ', en: 'department (in a company, etc.)' },
     { jp: 'やくす', en: 'to translate' },
-    { jp: '16－3', en: '#REF!' },
+  ],
+  '16-3': [
     { jp: 'きんえんしつ', en: 'non-smoking room' },
     { jp: 'うりきれ', en: 'sold out' },
     { jp: 'ねがう', en: 'to wish; to hope' },
@@ -2750,6 +2752,28 @@
             };
         }
 
+        function saveProgress() {
+            try {
+                localStorage.setItem('jlpt_progress', JSON.stringify(appState.progress));
+                localStorage.setItem('jlpt_xp', appState.xp);
+                localStorage.setItem('jlpt_streak', appState.streak);
+                localStorage.setItem('jlpt_lastStudy', appState.lastStudyDate || '');
+            } catch(e) {}
+        }
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('jlpt_progress');
+                if (saved) appState.progress = JSON.parse(saved);
+                const xp = localStorage.getItem('jlpt_xp');
+                if (xp) appState.xp = parseInt(xp);
+                const streak = localStorage.getItem('jlpt_streak');
+                if (streak) appState.streak = parseInt(streak);
+                const lastStudy = localStorage.getItem('jlpt_lastStudy');
+                if (lastStudy) appState.lastStudyDate = lastStudy;
+            } catch(e) {}
+        }
+
         function updateCardState(cardId, action) {
             const prog = appState.progress[appState.currentChapter]?.[cardId];
             if (!prog) return;
@@ -2764,6 +2788,7 @@
                 appState.xp += 5;
             }
             updateHeader();
+            saveProgress();
         }
 
         function renderQuiz() {
@@ -2867,6 +2892,7 @@
         // ========================
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
             initCards();
             renderChapters();
             updateHeader();
@@ -3019,6 +3045,10 @@
                     appState.progress = {};
                     appState.xp = 0;
                     appState.streak = 0;
+                    localStorage.removeItem('jlpt_progress');
+                    localStorage.removeItem('jlpt_xp');
+                    localStorage.removeItem('jlpt_streak');
+                    localStorage.removeItem('jlpt_lastStudy');
                     initCards();
                     updateHeader();
                 }
