@@ -37,25 +37,26 @@
 
         * { box-sizing: border-box; }
         html, body { margin: 0; padding: 0; }
-        body { padding: 2rem 1rem; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.7; -webkit-font-smoothing: antialiased; }
-        .page { max-width: 920px; margin: 0 auto; }
+        body { padding: 1rem 0 5.5rem; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        .page { max-width: 430px; margin: 0 auto; padding: 0 1rem; }
 
         /* Header */
-        .header { background: var(--card); border-radius: var(--radius-lg); padding: 2.5rem var(--pad); box-shadow: var(--shadow); margin-bottom: var(--gap); position: relative; overflow: hidden; }
-        .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: var(--accent-soft); border-radius: 50%; opacity: 0.6; }
+        .header { background: var(--card); border-radius: var(--radius-lg); padding: 1.4rem var(--pad) 1.2rem; box-shadow: var(--shadow); margin-bottom: var(--gap); position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: -30px; right: -30px; width: 130px; height: 130px; background: var(--accent-soft); border-radius: 50%; opacity: 0.5; }
         .header-inner { position: relative; z-index: 1; }
-        .header h1 { font-family: var(--font-jp); font-size: var(--fs-title); font-weight: 900; color: var(--accent-dark); margin: 0 0 0.5rem; line-height: 1.2; }
-        .header-subtitle { font-size: 0.95rem; color: var(--text-muted); margin: 0; }
-        .header-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
-        .stat-chip { background: var(--accent-soft); color: var(--accent-dark); font-size: var(--fs-small); font-weight: 700; padding: 0.5rem 1rem; border-radius: 999px; }
-        .stat-chip .label { display: block; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
-        .stat-chip .value { font-size: 1.4rem; font-weight: 900; color: var(--accent-dark); }
+        .header h1 { font-family: var(--font-jp); font-size: 1.5rem; font-weight: 900; color: var(--accent-dark); margin: 0 0 0.2rem; line-height: 1.2; }
+        .header-subtitle { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+        .header-stats { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; }
+        .stat-chip { background: var(--accent-soft); color: var(--accent-dark); font-size: var(--fs-small); font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 999px; display: flex; align-items: center; gap: 0.4rem; }
+        .stat-chip .label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .stat-chip .value { font-size: 1.1rem; font-weight: 900; color: var(--accent-dark); }
 
-        /* Navigation */
-        .nav { background: var(--card); border-radius: var(--radius-lg); padding: 0; box-shadow: var(--shadow); margin-bottom: var(--gap); display: flex; flex-wrap: wrap; }
-        .nav button { flex: 1; min-width: 100px; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-family: var(--font-jp); font-size: 0.95rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; }
-        .nav button:hover { color: var(--accent-dark); }
-        .nav button.active { color: var(--accent-dark); border-bottom-color: var(--accent); background: var(--accent-soft); }
+        /* Navigation - bottom bar */
+        .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--card); border-radius: 20px 20px 0 0; padding: 0.5rem 0.3rem 1rem; box-shadow: 0 -4px 24px rgba(139,111,71,0.13); display: flex; flex-wrap: nowrap; z-index: 1000; border-top: 1.5px solid var(--accent-soft); }
+        .nav button { flex: 1; min-width: 0; padding: 0.4rem 0.2rem 0.3rem; border: none; background: transparent; color: var(--text-muted); font-family: var(--font-jp); font-size: 0.65rem; font-weight: 700; cursor: pointer; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 0.15rem; transition: all 0.2s ease; border-bottom: none; }
+        .nav button .nav-icon { font-size: 1.45rem; line-height: 1; }
+        .nav button:hover { color: var(--accent-dark); background: var(--accent-soft); }
+        .nav button.active { color: var(--accent-dark); background: var(--accent-soft); }
 
         /* View */
         .view { display: none; }
@@ -141,9 +142,7 @@
         .subsection-title { font-family: var(--font-jp); font-size: 1rem; font-weight: 700; color: var(--accent-dark); margin-bottom: 0.7rem; padding-left: 0.7rem; border-left: 3px solid var(--accent); }
 
         @media (max-width: 600px) {
-            body { padding: 1.2rem 0.8rem; }
-            .header { padding: 1.8rem var(--pad); }
-            .header h1 { font-size: 1.8rem; }
+            .header h1 { font-size: 1.6rem; }
             .section-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
             .flashcard-container { padding: 2rem 1rem; min-height: 280px; }
             .card-jp { font-size: 1.8rem; }
@@ -159,16 +158,18 @@
                 <p class="header-subtitle">日本語教科書 フラッシュカード</p>
                 <div class="header-stats">
                     <div class="stat-chip">
-                        <span class="label">🔥 Streak / ストリーク</span>
+                        <span class="label">🔥</span>
                         <span class="value" id="streak-display">0</span>
+                        <span class="label">日</span>
                     </div>
                     <div class="stat-chip">
                         <span class="label">⭐ XP</span>
                         <span class="value" id="xp-display">0</span>
                     </div>
                     <div class="stat-chip">
-                        <span class="label">📚 Cards / カード</span>
+                        <span class="label">📚</span>
                         <span class="value" id="total-cards-display">0</span>
+                        <span class="label">語</span>
                     </div>
                 </div>
             </div>
@@ -182,44 +183,23 @@
             </label>
         </div>
 
-        <!-- Navigation -->
+        <!-- Navigation - bottom bar -->
         <div class="nav">
-            <button class="nav-btn active" data-view="home">📚 Textbook / 教科書</button>
-            <button class="nav-btn" data-view="study">🎴 Study / 学習</button>
-            <button class="nav-btn" data-view="stats">📊 Stats / 統計</button>
-            <button class="nav-btn" data-view="settings">⚙️ Settings / 設定</button>
+            <button class="nav-btn active" data-view="home"><span class="nav-icon">📚</span>ホーム</button>
+            <button class="nav-btn" data-view="mywords"><span class="nav-icon">✏️</span>マイ単語</button>
+            <button class="nav-btn" data-view="stats"><span class="nav-icon">📊</span>統計</button>
+            <button class="nav-btn" data-view="settings"><span class="nav-icon">⚙️</span>設定</button>
         </div>
 
-        <!-- Home View -->
+        <!-- Home View (Level 1: 3 sections) -->
         <div id="home" class="view active">
-            <!-- Super Beginner Section -->
-            <div class="textbook-section">
-                <div class="section-title">🔰 Super Beginner / スーパービギナー</div>
+            <div id="home-section-cards" style="display: flex; flex-direction: column; gap: 1rem; padding-top: 0.5rem;"></div>
+        </div>
 
-                <!-- STEP1 -->
-                <div class="subsection-group">
-                    <div class="subsection-title">【STEP1】Hiragana & Katakana / ひらがな・カタカナ</div>
-                    <div class="section-grid" id="superbegin-step1"></div>
-                </div>
-
-                <!-- STEP2 -->
-                <div class="subsection-group">
-                    <div class="subsection-title">【STEP2】Elementary / 基礎</div>
-                    <div class="section-grid" id="superbegin-step2"></div>
-                </div>
-            </div>
-
-            <!-- Beginner Section (Ch.1-12) -->
-            <div class="textbook-section">
-                <div class="section-title">📖 Beginner / ビギナー (Ch.1-12)</div>
-                <div class="section-grid" id="beginner-chapters"></div>
-            </div>
-
-            <!-- Intermediate Section (Ch.13-23) -->
-            <div class="textbook-section">
-                <div class="section-title">🎯 Intermediate / 中級 (Ch.13-23)</div>
-                <div class="section-grid" id="intermediate-chapters"></div>
-            </div>
+        <!-- List View (Level 2 & 3: chapters / subsections) -->
+        <div id="list" class="view">
+            <div id="list-breadcrumb" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;"></div>
+            <div id="list-content"></div>
         </div>
 
         <!-- Study View -->
@@ -245,6 +225,7 @@
                     <div class="card-jp" id="card-jp-back" style="font-size: 1.8rem;"></div>
                     <div class="card-romaji" id="card-romaji-back"></div>
                     <div class="card-en" id="card-en-back"></div>
+                    <div id="card-example" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line);font-size:0.88rem;color:var(--text-muted);line-height:1.7;text-align:left;font-style:normal;font-family:var(--font-jp);"></div>
                 </div>
             </div>
 
@@ -269,11 +250,16 @@
             </div>
 
             <div id="quiz-section" style="display: none;">
+                <!-- Romaji Toggle Button -->
+                <div style="text-align: right; margin-bottom: 0.5rem;">
+                    <button id="btn-toggle-romaji" style="font-size: 0.85rem; padding: 0.3rem 0.9rem; border-radius: 999px; border: 2px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-weight: 900; letter-spacing: 0.05em;">ABC</button>
+                </div>
                 <!-- Question Always Visible -->
                 <div class="flashcard-container">
-                    <div class="card-label">Question / 問題</div>
+                    <div class="card-label">読み方は？ How do you read it?</div>
                     <div class="card-jp" id="quiz-question">Loading...</div>
-                    <div class="card-en" id="quiz-en"></div>
+                    <div id="quiz-romaji" style="font-size: 1rem; color: var(--text-muted); margin-top: 0.3rem; display: none;"></div>
+                    <div id="quiz-en" style="display:none; font-size:0.88rem; color:var(--text-muted); margin-top:0.5rem; font-family:var(--font-body);"></div>
                 </div>
 
                 <!-- Choices Grid -->
@@ -361,6 +347,40 @@
             </div>
         </div>
 
+        <!-- My Words View -->
+        <div id="mywords" class="view">
+
+            <!-- Bulk Import -->
+            <div class="progress-box" style="margin-bottom: 1rem;">
+                <div class="subsection-title" style="margin-bottom: 0.5rem;">📋 一括インポート / Bulk Import</div>
+                <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.8rem;line-height:1.6;">
+                    ① 下のプロンプトをコピーしてAI（ChatGPT / Claude / Geminiなど）に貼り付ける<br>
+                    ② 単語リストを追加して送信<br>
+                    ③ AIの出力をそのままここに貼り付けて「インポート」
+                </div>
+                <button id="mw-copy-prompt-btn" style="width:100%;padding:0.6rem;border-radius:8px;border:2px dashed var(--accent);background:transparent;color:var(--accent);font-weight:700;font-size:0.85rem;cursor:pointer;margin-bottom:0.8rem;">📄 AIプロンプトをコピー</button>
+                <textarea id="mw-import-text" rows="5" placeholder="AIの出力をここに貼り付ける&#10;例）食べる,たべる,taberu,to eat,ご飯を食べます。,I eat rice.&#10;　　りんご,りんご,ringo,apple,りんごが好きです。,I like apples."
+                    style="width:100%;padding:0.7rem;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--text);font-family:var(--font-jp);font-size:0.85rem;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6;"></textarea>
+                <button id="mw-import-btn" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">インポートする</button>
+                <div id="mw-import-status" style="font-size:0.82rem;color:var(--ok);margin-top:0.4rem;text-align:center;min-height:1.2em;"></div>
+            </div>
+
+            <!-- Study Button + Summary -->
+            <div id="mw-study-section" style="display:none; margin-bottom: 1rem;">
+                <button id="mw-study-btn" class="btn btn-success" style="width: 100%; font-size: 1rem; padding: 0.9rem;">
+                    🎴 マイ単語を学習する（<span id="mw-count">0</span>語）
+                </button>
+                <div id="mw-progress-bar-wrap" style="margin-top: 0.6rem;"></div>
+            </div>
+
+            <!-- Word List -->
+            <div id="mw-list-header" style="display:none; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.85rem; color:var(--text-muted);">単語リスト</span>
+                <button id="mw-lang-toggle" style="padding:0.3rem 1.1rem; border-radius:999px; border:2px solid var(--accent); background:transparent; color:var(--accent); font-weight:900; font-size:0.9rem; cursor:pointer;">🇯🇵 JP</button>
+            </div>
+            <div id="mw-list"></div>
+        </div>
+
         <!-- Settings View -->
         <div id="settings" class="view">
             <div class="settings-box">
@@ -371,7 +391,19 @@
                         <span>Sound Effects / 音声効果</span>
                     </label>
                 </div>
-                <div class="settings-item" style="margin-top: 2rem; padding-top: 1rem; border-top: 2px dashed var(--line);">
+
+                <div class="settings-item" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed var(--line);">
+                    <div style="font-weight:700; margin-bottom:0.6rem;">🤖 AI自動入力 / Gemini API Key</div>
+                    <small style="display:block; color:var(--text-muted); margin-bottom:0.7rem;">マイ単語の自動入力に使用します。Google AI Studio（aistudio.google.com）で取得してください。</small>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="password" id="setting-gemini-key" placeholder="AIza... または AQ...."
+                            style="flex:1; padding:0.6rem 0.8rem; border-radius:8px; border:2px solid var(--line); background:var(--bg); color:var(--text); font-size:0.9rem; outline:none;">
+                        <button id="btn-save-gemini-key" class="btn btn-primary" style="flex-shrink:0;">保存</button>
+                    </div>
+                    <div id="gemini-key-status" style="font-size:0.8rem; margin-top:0.4rem; color:var(--ok);"></div>
+                </div>
+
+                <div class="settings-item" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px dashed var(--line);">
                     <button class="btn btn-warning" id="btn-reset" style="margin-right: 1rem;">🔄 Reset Progress / リセット</button>
                     <small style="display: block; margin-top: 0.5rem; color: var(--text-muted);">Cards will be kept. / カードは保持されます。</small>
                 </div>
@@ -385,6 +417,137 @@
         // ========================
 
         // Subsections for each chapter
+        // [kanji, onyomi, kunyomi, english, ex1_jp, ex1_en, ex2_jp, ex2_en]
+        const KANJI_DATA = {
+            'N5': [
+                ['一','イチ・イツ','ひと(つ)','one','一つ（ひとつ）','one thing','一月（いちがつ）','January'],
+                ['右','ウ・ユウ','みぎ','right','右手（みぎて）','right hand','右折（うせつ）','turn right'],
+                ['雨','ウ','あめ','rain','雨水（あまみず）','rainwater','大雨（おおあめ）','heavy rain'],
+                ['円','エン','-','circle・yen','百円（ひゃくえん）','100 yen','円い（まるい）','round'],
+                ['王','オウ','-','king','王様（おうさま）','king','女王（じょおう）','queen'],
+                ['音','オン・イン','おと・ね','sound','音楽（おんがく）','music','音（おと）','sound'],
+                ['下','カ・ゲ','した・しも','below・down','地下（ちか）','underground','下る（くだる）','go down'],
+                ['火','カ','ひ','fire','火曜日（かようび）','Tuesday','花火（はなび）','fireworks'],
+                ['花','カ','はな','flower','花火（はなび）','fireworks','花見（はなみ）','flower viewing'],
+                ['貝','バイ','かい','shell','貝（かい）','shellfish','貝殻（かいがら）','shell'],
+                ['学','ガク','まな(ぶ)','study・learn','学校（がっこう）','school','学ぶ（まなぶ）','to study'],
+                ['気','キ・ケ','-','spirit・energy','天気（てんき）','weather','気持ち（きもち）','feeling'],
+                ['九','キュウ・ク','ここの(つ)','nine','九月（くがつ）','September','九つ（ここのつ）','nine things'],
+                ['休','キュウ','やす(む)','rest','休日（きゅうじつ）','holiday','休む（やすむ）','to rest'],
+                ['玉','ギョク','たま','ball・jewel','お玉（おたま）','ladle','玉ねぎ（たまねぎ）','onion'],
+                ['金','キン・コン','かね・かな','gold・money','金曜日（きんようび）','Friday','お金（おかね）','money'],
+                ['空','クウ','そら・から','sky・empty','空港（くうこう）','airport','空（そら）','sky'],
+                ['月','ゲツ・ガツ','つき','moon・month','月曜日（げつようび）','Monday','月（つき）','moon'],
+                ['犬','ケン','いぬ','dog','子犬（こいぬ）','puppy','番犬（ばんけん）','guard dog'],
+                ['見','ケン','み(る)','see・look','見物（けんぶつ）','sightseeing','見る（みる）','to see'],
+                ['五','ゴ','いつ(つ)','five','五月（ごがつ）','May','五つ（いつつ）','five things'],
+                ['口','コウ・ク','くち','mouth','出口（でぐち）','exit','入口（いりぐち）','entrance'],
+                ['校','コウ','-','school','学校（がっこう）','school','校長（こうちょう）','principal'],
+                ['左','サ','ひだり','left','左手（ひだりて）','left hand','左折（させつ）','turn left'],
+                ['三','サン','み(つ)','three','三月（さんがつ）','March','三つ（みっつ）','three things'],
+                ['山','サン','やま','mountain','富士山（ふじさん）','Mt. Fuji','山登り（やまのぼり）','hiking'],
+                ['子','シ・ス','こ','child','子供（こども）','child','子猫（こねこ）','kitten'],
+                ['四','シ','よ(つ)・よん','four','四月（しがつ）','April','四つ（よっつ）','four things'],
+                ['糸','シ','いと','thread','毛糸（けいと）','yarn','糸（いと）','thread'],
+                ['字','ジ','-','character','文字（もじ）','letter','字（じ）','character'],
+                ['耳','ジ','みみ','ear','耳（みみ）','ear','耳鼻科（じびか）','ENT clinic'],
+                ['七','シチ','なな(つ)','seven','七月（しちがつ）','July','七つ（ななつ）','seven things'],
+                ['車','シャ','くるま','car・vehicle','電車（でんしゃ）','train','自動車（じどうしゃ）','car'],
+                ['手','シュ','て','hand','手紙（てがみ）','letter','上手（じょうず）','skilled'],
+                ['十','ジュウ・ジッ','とお','ten','十月（じゅうがつ）','October','十（じゅう）','ten'],
+                ['出','シュツ','で(る)・だ(す)','exit・come out','出口（でぐち）','exit','出る（でる）','to leave'],
+                ['女','ジョ・ニョ','おんな','woman','女性（じょせい）','woman','女の子（おんなのこ）','girl'],
+                ['小','ショウ','ちい(さい)','small','小学校（しょうがっこう）','elementary school','小さい（ちいさい）','small'],
+                ['上','ジョウ','うえ・かみ','above・up','上手（じょうず）','skilled','上（うえ）','above'],
+                ['森','シン','もり','forest','森（もり）','forest','森林（しんりん）','forests'],
+                ['人','ジン・ニン','ひと','person','人口（じんこう）','population','外国人（がいこくじん）','foreigner'],
+                ['水','スイ','みず','water','水曜日（すいようび）','Wednesday','水（みず）','water'],
+                ['正','セイ・ショウ','ただ(しい)','correct','正しい（ただしい）','correct','正月（しょうがつ）','New Year'],
+                ['生','セイ・ショウ','い(きる)・なま','life・birth','先生（せんせい）','teacher','学生（がくせい）','student'],
+                ['青','セイ・ショウ','あお','blue','青い（あおい）','blue','青空（あおぞら）','blue sky'],
+                ['夕','セキ','ゆう','evening','夕方（ゆうがた）','evening','夕食（ゆうしょく）','dinner'],
+                ['石','セキ・シャク','いし','stone','石（いし）','stone','石橋（いしばし）','stone bridge'],
+                ['赤','セキ・シャク','あか','red','赤い（あかい）','red','赤ちゃん（あかちゃん）','baby'],
+                ['千','セン','ち','thousand','千円（せんえん）','1000 yen','三千（さんぜん）','three thousand'],
+                ['川','セン','かわ','river','川（かわ）','river','川魚（かわざかな）','river fish'],
+                ['先','セン','さき','ahead・previous','先生（せんせい）','teacher','先（さき）','ahead'],
+                ['足','ソク','あし・た(りる)','foot・enough','足（あし）','foot','足りる（たりる）','to be enough'],
+                ['村','ソン','むら','village','村（むら）','village','農村（のうそん）','farming village'],
+                ['大','ダイ・タイ','おお(きい)','big','大学（だいがく）','university','大きい（おおきい）','big'],
+                ['男','ダン・ナン','おとこ','man','男性（だんせい）','man','男の子（おとこのこ）','boy'],
+                ['竹','チク','たけ','bamboo','竹（たけ）','bamboo','竹林（ちくりん）','bamboo grove'],
+                ['中','チュウ','なか','middle・inside','中学校（ちゅうがっこう）','junior high','中（なか）','inside'],
+                ['虫','チュウ','むし','insect','虫（むし）','insect','虫歯（むしば）','cavity'],
+                ['町','チョウ','まち','town','町（まち）','town','下町（したまち）','old town'],
+                ['天','テン','-','heaven・sky','天気（てんき）','weather','天ぷら（てんぷら）','tempura'],
+                ['田','デン','た','rice field','田んぼ（たんぼ）','rice paddy','田舎（いなか）','countryside'],
+                ['土','ド・ト','つち','earth・soil','土曜日（どようび）','Saturday','土（つち）','soil'],
+                ['二','ニ','ふた(つ)','two','二月（にがつ）','February','二つ（ふたつ）','two things'],
+                ['日','ニチ・ジツ','ひ・か','sun・day','日曜日（にちようび）','Sunday','日本（にほん）','Japan'],
+                ['入','ニュウ','はい(る)','enter','入口（いりぐち）','entrance','入る（はいる）','to enter'],
+                ['年','ネン','とし','year','今年（ことし）','this year','去年（きょねん）','last year'],
+                ['白','ハク・ビャク','しろ','white','白い（しろい）','white','白紙（はくし）','blank paper'],
+                ['八','ハチ','や(つ)','eight','八月（はちがつ）','August','八つ（やっつ）','eight things'],
+                ['百','ヒャク','もも','hundred','百円（ひゃくえん）','100 yen','三百（さんびゃく）','three hundred'],
+                ['文','ブン・モン','ふみ','writing・text','文章（ぶんしょう）','sentence','文（ふみ）','text'],
+                ['木','モク・ボク','き','tree','木曜日（もくようび）','Thursday','木（き）','tree'],
+                ['本','ホン','-','book・origin','日本（にほん）','Japan','本（ほん）','book'],
+                ['名','メイ・ミョウ','な','name','名前（なまえ）','name','有名（ゆうめい）','famous'],
+                ['目','モク','め','eye','目（め）','eye','目標（もくひょう）','goal'],
+                ['立','リツ・リュウ','た(つ)','stand','立つ（たつ）','to stand','立場（たちば）','position'],
+                ['力','リョク・リキ','ちから','power','力（ちから）','strength','努力（どりょく）','effort'],
+                ['林','リン','はやし','woods','林（はやし）','woods','森林（しんりん）','forest'],
+                ['六','ロク','む(つ)','six','六月（ろくがつ）','June','六つ（むっつ）','six things'],
+                ['万','マン・バン','-','ten thousand','一万円（いちまんえん）','10,000 yen','万が一（まんがいち）','just in case'],
+            ],
+            'N4': [],
+            'N3': [],
+            'N2': [],
+            'N1': []
+        };
+
+        // 一字では意味が成立しない漢字のクイズ用単語オーバーライド
+        // { 漢字: { question: '表示する単語', reading: 'よみかた' } }
+        const KANJI_QUIZ_OVERRIDES = {
+            '学': { question: '学校', reading: 'がっこう' },
+            '校': { question: '学校', reading: 'がっこう' },
+            '気': { question: '天気', reading: 'てんき' },
+            '天': { question: '天気', reading: 'てんき' },
+            '文': { question: '文字', reading: 'もじ' },
+            '字': { question: '文字', reading: 'もじ' },
+            '名': { question: '名前', reading: 'なまえ' },
+            '夕': { question: '夕方', reading: 'ゆうがた' },
+            '女': { question: '女の子', reading: 'おんなのこ' },
+            '子': { question: '女の子', reading: 'おんなのこ' },
+            '千': { question: '千円', reading: 'せんえん' },
+            '円': { question: '千円', reading: 'せんえん' },
+            '生': { question: '先生', reading: 'せんせい' },
+            '先': { question: '先生', reading: 'せんせい' },
+            '田': { question: '田中', reading: 'たなか' },
+            '中': { question: '田中', reading: 'たなか' },
+            '日': { question: '金曜日', reading: 'きんようび' },
+            '金': { question: '金曜日', reading: 'きんようび' },
+            '年': { question: '三年', reading: 'さんねん' },
+            '三': { question: '三年', reading: 'さんねん' },
+            '七': { question: '七百', reading: 'ななひゃく' },
+            '百': { question: '七百', reading: 'ななひゃく' },
+            '六': { question: '六万', reading: 'ろくまん' },
+            '万': { question: '六万', reading: 'ろくまん' },
+            '花': { question: '花火', reading: 'はなび' },
+            '火': { question: '花火', reading: 'はなび' },
+            '大': { question: '大人', reading: 'おとな' },
+            '人': { question: '大人', reading: 'おとな' },
+            '男': { question: '男の子', reading: 'おとこのこ' },
+            '森': { question: '森林', reading: 'しんりん' },
+            '林': { question: '森林', reading: 'しんりん' },
+            '上': { question: '上手', reading: 'じょうず' },
+            '手': { question: '上手', reading: 'じょうず' },
+            '入': { question: '入口', reading: 'いりぐち' },
+            '口': { question: '入口', reading: 'いりぐち' },
+            '青': { question: '青空', reading: 'あおぞら' },
+            '空': { question: '青空', reading: 'あおぞら' },
+        };
+
         const SUBSECTIONS = {
             1: ['1', '1-2', '1-3', '1-4'],
             2: ['2-1', '2-2', '2-3'],
@@ -2326,8 +2489,13 @@
             mode: 'flashcard',
             direction: 'jp-to-en',
             showEn: true,
-            allCards: [],  // 全カード（常に保持）
-            cards: [],     // セッション用カード（フィルター済み）
+            showRomaji: false,
+            navSection: null,
+            navChapter: null,
+            allCards: [],      // 全カード（常に保持）
+            cards: [],         // セッション用カード（フィルター済み）
+            customWords: [],   // マイ単語
+            mwLangMode: 'jp', // マイ単語表示モード: 'jp' | 'en'
             progress: {},
             streak: 0,
             xp: 0,
@@ -2337,6 +2505,131 @@
         // ========================
         // INITIALIZATION
         // ========================
+
+        function katakanaToHiragana(str) {
+            return str.replace(/[ァ-ヶ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+        }
+
+        // 訓読みの送り仮名を展開: まな(ぶ)→まなぶ、ひと(つ)→ひとつ
+        function expandKunyomi(kunyomi) {
+            if (!kunyomi) return '';
+            const first = kunyomi.split(/[・、]/)[0].trim();
+            const expanded = first.replace(/[（(]([^）)]+)[）)]/g, '$1');
+            return (expanded === '-' || expanded === '―') ? '' : expanded;
+        }
+
+        // クイズ用: {question, reading} を返す
+        // 学ぶ→{question:'学ぶ', reading:'まなぶ'}, 雨→{question:'雨', reading:'あめ'}
+        function getKanjiQuizItem(card) {
+            if (!card) return { question: '', reading: '' };
+            if (!card.isKanji) return { question: card.japanese, reading: romajiToHiragana(card.romaji) || card.japanese };
+
+            // オーバーライドがあればそちらを優先
+            if (KANJI_QUIZ_OVERRIDES[card.japanese]) {
+                return { ...KANJI_QUIZ_OVERRIDES[card.japanese] };
+            }
+
+            const numberKanji = '一二三四五六七八九十百千万';
+            const onyomi = card.onyomi ? katakanaToHiragana(card.onyomi.split(/[・、]/)[0].trim()) : '';
+
+            // 数字は音読みをそのまま使用
+            if (numberKanji.includes(card.japanese)) {
+                return { question: card.japanese, reading: onyomi || card.japanese };
+            }
+
+            // 訓読みがある場合
+            if (card.kunyomi && card.kunyomi !== '-' && card.kunyomi !== '―') {
+                const firstKun = card.kunyomi.split(/[・、]/)[0].trim();
+                const okuMatch = firstKun.match(/^([^（(]+)[（(]([^）)]+)[）)]/);
+                if (okuMatch) {
+                    // 送り仮名あり: 学(まな+ぶ) → question:学ぶ, reading:まなぶ
+                    return { question: card.japanese + okuMatch[2], reading: okuMatch[1] + okuMatch[2] };
+                }
+                const plain = firstKun.replace(/[（(][^）)]*[）)]/g, '');
+                if (plain && plain !== '-' && plain !== '―') {
+                    return { question: card.japanese, reading: plain };
+                }
+            }
+
+            // 訓読みなし: 音読みのみ(王→おう)
+            return { question: card.japanese, reading: onyomi || card.japanese };
+        }
+
+        function getCardReading(card) {
+            const item = getKanjiQuizItem(card);
+            return item.reading;
+        }
+
+        function romajiToHiragana(romaji) {
+            if (!romaji) return '';
+            let s = romaji.toLowerCase().trim();
+            s = s.replace(/ā/g,'aa').replace(/ū/g,'uu').replace(/ō/g,'oo').replace(/ē/g,'ee').replace(/ī/g,'ii');
+            const table = [
+                ['sha','しゃ'],['shi','し'],['shu','しゅ'],['she','しぇ'],['sho','しょ'],
+                ['chi','ち'],['cha','ちゃ'],['chu','ちゅ'],['che','ちぇ'],['cho','ちょ'],
+                ['tchi','っち'],['ttsu','っつ'],['tsu','つ'],
+                ['kya','きゃ'],['kyu','きゅ'],['kyo','きょ'],
+                ['nya','にゃ'],['nyu','にゅ'],['nyo','にょ'],
+                ['hya','ひゃ'],['hyu','ひゅ'],['hyo','ひょ'],
+                ['mya','みゃ'],['myu','みゅ'],['myo','みょ'],
+                ['rya','りゃ'],['ryu','りゅ'],['ryo','りょ'],
+                ['gya','ぎゃ'],['gyu','ぎゅ'],['gyo','ぎょ'],
+                ['bya','びゃ'],['byu','びゅ'],['byo','びょ'],
+                ['pya','ぴゃ'],['pyu','ぴゅ'],['pyo','ぴょ'],
+                ['ja','じゃ'],['ji','じ'],['ju','じゅ'],['je','じぇ'],['jo','じょ'],
+                ['ka','か'],['ki','き'],['ku','く'],['ke','け'],['ko','こ'],
+                ['sa','さ'],['si','し'],['su','す'],['se','せ'],['so','そ'],
+                ['ta','た'],['ti','ち'],['tu','つ'],['te','て'],['to','と'],
+                ['na','な'],['ni','に'],['nu','ぬ'],['ne','ね'],['no','の'],
+                ['ha','は'],['hi','ひ'],['fu','ふ'],['hu','ふ'],['he','へ'],['ho','ほ'],
+                ['ma','ま'],['mi','み'],['mu','む'],['me','め'],['mo','も'],
+                ['ya','や'],['yu','ゆ'],['yo','よ'],
+                ['ra','ら'],['ri','り'],['ru','る'],['re','れ'],['ro','ろ'],
+                ['wa','わ'],['wo','を'],
+                ['ga','が'],['gi','ぎ'],['gu','ぐ'],['ge','げ'],['go','ご'],
+                ['za','ざ'],['zi','じ'],['zu','ず'],['ze','ぜ'],['zo','ぞ'],
+                ['da','だ'],['di','ぢ'],['du','づ'],['de','で'],['do','ど'],
+                ['ba','ば'],['bi','び'],['bu','ぶ'],['be','べ'],['bo','ぼ'],
+                ['pa','ぱ'],['pi','ぴ'],['pu','ぷ'],['pe','ぺ'],['po','ぽ'],
+                ['a','あ'],['i','い'],['u','う'],['e','え'],['o','お'],
+            ];
+            const vowels = new Set(['a','i','u','e','o']);
+            let result = '';
+            let i = 0;
+            while (i < s.length) {
+                const c = s[i];
+                // Double consonant → っ
+                if (c !== 'n' && i + 1 < s.length && s[i+1] === c && !'aiueo '.includes(c)) {
+                    result += 'っ';
+                    i++;
+                    continue;
+                }
+                // Try table match (longest first)
+                let matched = false;
+                for (const [roma, hira] of table) {
+                    if (s.startsWith(roma, i)) {
+                        result += hira;
+                        i += roma.length;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    // Standalone n before consonant or end → ん
+                    if (c === 'n' && (i + 1 >= s.length || (!vowels.has(s[i+1]) && s[i+1] !== 'y'))) {
+                        result += 'ん';
+                    } else if (c === '-') {
+                        result += 'ー';
+                    } else if (c === ' ') {
+                        result += '　';
+                    } else {
+                        result += c;
+                    }
+                    i++;
+                }
+            }
+            return result;
+        }
 
         function initCards() {
             appState.allCards = [];  // 全カードを初期化
@@ -2366,211 +2659,279 @@
                     });
                 }
             });
+            // 漢字カードを追加
+            Object.entries(KANJI_DATA).forEach(([level, kanjis]) => {
+                const chapterId = `kanji-${level}`;
+                kanjis.forEach((k, idx) => {
+                    const cardId = `${chapterId}-${idx}`;
+                    appState.allCards.push({
+                        id: cardId,
+                        japanese: k[0],
+                        english: k[3],
+                        romaji: '',
+                        onyomi: k[1],
+                        kunyomi: k[2],
+                        ex1jp: k[4], ex1en: k[5],
+                        ex2jp: k[6], ex2en: k[7],
+                        chapter: chapterId,
+                        isKanji: true
+                    });
+                    if (!appState.progress[chapterId]) appState.progress[chapterId] = {};
+                    if (!appState.progress[chapterId][cardId]) {
+                        appState.progress[chapterId][cardId] = { state: 'new', correct: 0, again: 0 };
+                    }
+                });
+            });
+
             appState.cards = [...appState.allCards];  // 初期状態では全カード
         }
 
-        function renderChapters() {
-            // Super Beginner - STEP1
-            const step1 = document.getElementById('superbegin-step1');
-            step1.innerHTML = '';
-            TEXTBOOK_STRUCTURE.superbegin.step1.forEach(item => {
-                step1.appendChild(createChapterCard(item, 'superbegin'));
+        function calcProgress(sectionIds) {
+            let total = 0, mastered = 0, studied = 0;
+            sectionIds.forEach(sid => {
+                const cards = appState.allCards.filter(c => c.chapter === sid);
+                const prog = appState.progress[sid] || {};
+                total += cards.length;
+                const vals = Object.values(prog);
+                mastered += vals.filter(p => p.state === 'mastered' || p.state === 'burned').length;
+                studied += vals.filter(p => p.state !== 'new').length;
             });
+            return {
+                total, mastered, studied,
+                percent: total > 0 ? Math.round((studied / total) * 100) : 0,
+                masteredPercent: total > 0 ? Math.round((mastered / total) * 100) : 0
+            };
+        }
 
-            // Super Beginner - STEP2
-            const step2 = document.getElementById('superbegin-step2');
-            step2.innerHTML = '';
-            TEXTBOOK_STRUCTURE.superbegin.step2.forEach(item => {
-                step2.appendChild(createChapterCard(item, 'superbegin'));
-            });
+        function progressBarHTML(p) {
+            const { percent, masteredPercent, studied, total } = p;
+            const learningPct = percent - masteredPercent;
+            return `
+                <div style="margin-top: 0.6rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.25rem;">
+                        <span>${studied}/${total}語</span><span style="font-weight:700;color:var(--accent);">${percent}%</span>
+                    </div>
+                    <div style="height:6px;background:var(--line);border-radius:99px;overflow:hidden;display:flex;">
+                        <div style="height:100%;width:${masteredPercent}%;background:var(--ok);transition:width 0.4s ease;"></div>
+                        <div style="height:100%;width:${learningPct}%;background:#f59e0b;transition:width 0.4s ease;"></div>
+                    </div>
+                </div>`;
+        }
 
-            // Beginner Chapters with collapsible subsections
-            const beginnerGrid = document.getElementById('beginner-chapters');
-            beginnerGrid.innerHTML = '';
-            TEXTBOOK_STRUCTURE.beginner.chapters.forEach(ch => {
-                const container = document.createElement('div');
-                container.style.gridColumn = '1 / -1';
-                container.style.marginBottom = '1rem';
+        function renderHome() {
+            const container = document.getElementById('home-section-cards');
+            if (!container) return;
+            container.innerHTML = '';
 
-                // Chapter title (clickable header)
-                const titleEl = document.createElement('div');
-                titleEl.className = 'accordion-header';
-                titleEl.style.fontWeight = '700';
-                titleEl.style.fontSize = '1.1rem';
-                titleEl.style.padding = '1rem';
-                titleEl.style.background = 'var(--accent)';
-                titleEl.style.color = '#fff';
-                titleEl.style.borderRadius = 'var(--radius-lg)';
-                titleEl.style.cursor = 'pointer';
-                titleEl.style.display = 'flex';
-                titleEl.style.justifyContent = 'space-between';
-                titleEl.style.alignItems = 'center';
-                titleEl.style.userSelect = 'none';
-                titleEl.innerHTML = `<span>${ch.name}</span><span style="font-size: 1.3rem;">▼</span>`;
-                container.appendChild(titleEl);
+            const sections = [
+                {
+                    key: 'superbegin',
+                    emoji: '🔰',
+                    title: 'Super Beginner',
+                    sub: 'スーパービギナー',
+                    ids: [...TEXTBOOK_STRUCTURE.superbegin.step1, ...TEXTBOOK_STRUCTURE.superbegin.step2].map(i => i.id),
+                    color: '#FFF0E6', iconBg: '#FFD4A8', iconColor: '#B05B00'
+                },
+                {
+                    key: 'beginner',
+                    emoji: '📖',
+                    title: 'Beginner',
+                    sub: 'ビギナー (Ch.1〜12)',
+                    ids: TEXTBOOK_STRUCTURE.beginner.chapters.flatMap(ch => ch.subsections),
+                    color: '#E8F5E9', iconBg: '#A8D8AA', iconColor: '#2E6B30'
+                },
+                {
+                    key: 'intermediate',
+                    emoji: '🎯',
+                    title: 'Intermediate',
+                    sub: '中級 (Ch.13〜23)',
+                    ids: TEXTBOOK_STRUCTURE.intermediate.chapters.flatMap(ch => ch.subsections),
+                    color: '#EDE7F6', iconBg: '#C5B3E8', iconColor: '#4A2D8A'
+                },
+                {
+                    key: 'kanji',
+                    emoji: '漢',
+                    title: 'Kanji',
+                    sub: '漢字 (N5〜N1)',
+                    ids: ['kanji-N5', 'kanji-N4', 'kanji-N3', 'kanji-N2', 'kanji-N1'],
+                    color: '#FDE8EF', iconBg: '#F4B8CC', iconColor: '#8C1A3D'
+                }
+            ];
 
-                // Subsections grid (initially hidden)
-                const subsGrid = document.createElement('div');
-                subsGrid.className = 'accordion-content';
-                subsGrid.style.display = 'none';
-                subsGrid.style.display = 'grid';
-                subsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(150px, 1fr))';
-                subsGrid.style.gap = '0.8rem';
-                subsGrid.style.padding = '1rem';
-                subsGrid.style.background = 'var(--accent-soft)';
-                subsGrid.style.borderRadius = '0 0 var(--radius-lg) var(--radius-lg)';
-                subsGrid.style.maxHeight = '0px';
-                subsGrid.style.overflow = 'hidden';
-                subsGrid.style.transition = 'all 0.3s ease';
-
-                ch.subsections.forEach(subId => {
-                    const subCard = createSubsectionCard(subId);
-                    subsGrid.appendChild(subCard);
-                });
-
-                container.appendChild(subsGrid);
-
-                // Toggle functionality
-                let isOpen = false;
-                titleEl.addEventListener('click', () => {
-                    isOpen = !isOpen;
-                    if (isOpen) {
-                        subsGrid.style.display = 'grid';
-                        subsGrid.style.maxHeight = '1000px';
-                        titleEl.querySelector('span:last-child').textContent = '▲';
-                    } else {
-                        subsGrid.style.maxHeight = '0px';
-                        setTimeout(() => {
-                            subsGrid.style.display = 'none';
-                        }, 300);
-                        titleEl.querySelector('span:last-child').textContent = '▼';
-                    }
-                });
-
-                beginnerGrid.appendChild(container);
-            });
-
-            // Intermediate Chapters with collapsible subsections
-            const intermediateGrid = document.getElementById('intermediate-chapters');
-            intermediateGrid.innerHTML = '';
-            TEXTBOOK_STRUCTURE.intermediate.chapters.forEach(ch => {
-                const container = document.createElement('div');
-                container.style.gridColumn = '1 / -1';
-                container.style.marginBottom = '1rem';
-
-                const titleEl = document.createElement('div');
-                titleEl.className = 'accordion-header';
-                titleEl.style.fontWeight = '700';
-                titleEl.style.fontSize = '1.1rem';
-                titleEl.style.padding = '1rem';
-                titleEl.style.background = 'var(--accent)';
-                titleEl.style.color = '#fff';
-                titleEl.style.borderRadius = 'var(--radius-lg)';
-                titleEl.style.cursor = 'pointer';
-                titleEl.style.display = 'flex';
-                titleEl.style.justifyContent = 'space-between';
-                titleEl.style.alignItems = 'center';
-                titleEl.style.userSelect = 'none';
-                titleEl.innerHTML = `<span>${ch.name}</span><span style="font-size: 1.3rem;">▼</span>`;
-                container.appendChild(titleEl);
-
-                const subsGrid = document.createElement('div');
-                subsGrid.className = 'accordion-content';
-                subsGrid.style.display = 'none';
-                subsGrid.style.display = 'grid';
-                subsGrid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(150px, 1fr))';
-                subsGrid.style.gap = '0.8rem';
-                subsGrid.style.padding = '1rem';
-                subsGrid.style.background = 'var(--accent-soft)';
-                subsGrid.style.borderRadius = '0 0 var(--radius-lg) var(--radius-lg)';
-                subsGrid.style.maxHeight = '0px';
-                subsGrid.style.overflow = 'hidden';
-                subsGrid.style.transition = 'all 0.3s ease';
-
-                ch.subsections.forEach(subId => {
-                    const subCard = createSubsectionCard(subId);
-                    subsGrid.appendChild(subCard);
-                });
-
-                container.appendChild(subsGrid);
-
-                let isOpen = false;
-                titleEl.addEventListener('click', () => {
-                    isOpen = !isOpen;
-                    if (isOpen) {
-                        subsGrid.style.display = 'grid';
-                        subsGrid.style.maxHeight = '1000px';
-                        titleEl.querySelector('span:last-child').textContent = '▲';
-                    } else {
-                        subsGrid.style.maxHeight = '0px';
-                        setTimeout(() => {
-                            subsGrid.style.display = 'none';
-                        }, 300);
-                        titleEl.querySelector('span:last-child').textContent = '▼';
-                    }
-                });
-
-                intermediateGrid.appendChild(container);
+            sections.forEach(sec => {
+                const p = calcProgress(sec.ids);
+                const card = document.createElement('div');
+                card.className = 'chapter-card';
+                card.style.cssText = `display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;cursor:pointer;background:${sec.color};border-color:transparent;`;
+                card.innerHTML = `
+                    <div style="width:52px;height:52px;border-radius:14px;background:${sec.iconBg};display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">${sec.emoji}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:1rem;font-weight:900;color:${sec.iconColor};font-family:var(--font-jp);">${sec.title}</div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.4rem;">${sec.sub}</div>
+                        ${progressBarHTML(p)}
+                    </div>
+                    <span style="font-size:1.3rem;color:${sec.iconColor};opacity:0.6;">›</span>
+                `;
+                card.addEventListener('click', () => navigateTo('section', sec.key));
+                container.appendChild(card);
             });
         }
 
-        function createSubsectionCard(subsectionId) {
-            const cardsInSection = appState.allCards.filter(c => c.chapter === subsectionId);  // allCards を使用
-            const progress = appState.progress[subsectionId] || {};
-            const mastered = Object.values(progress).filter(p => p.state === 'mastered' || p.state === 'burned').length;
-            const percent = cardsInSection.length > 0 ? Math.round((mastered / cardsInSection.length) * 100) : 0;
+        function renderListView() {
+            const content = document.getElementById('list-content');
+            const breadcrumb = document.getElementById('list-breadcrumb');
+            if (!content) return;
+            content.innerHTML = '';
+
+            const { navSection, navChapter } = appState;
+
+            // Level 2: section selected, no chapter yet
+            if (navSection && !navChapter) {
+                if (navSection === 'kanji') {
+                    breadcrumb.innerHTML = `<span style="color:var(--accent);cursor:pointer;" onclick="navigateTo('home')">Home</span> › 漢字`;
+                    const grid = document.createElement('div');
+                    grid.className = 'section-grid';
+                    ['N5','N4','N3','N2','N1'].forEach(level => {
+                        const chId = `kanji-${level}`;
+                        const cards = appState.allCards.filter(c => c.chapter === chId);
+                        const p = calcProgress([chId]);
+                        const levelEmoji = { N5:'🟢', N4:'🔵', N3:'🟡', N2:'🟠', N1:'🔴' }[level];
+                        const card = document.createElement('div');
+                        card.className = 'chapter-card';
+                        card.innerHTML = `
+                            <div class="chapter-title">${levelEmoji} ${level}</div>
+                            <div class="chapter-subtitle">${cards.length > 0 ? cards.length + '漢字' : '近日公開'}</div>
+                            ${cards.length > 0 ? progressBarHTML(p) : ''}
+                        `;
+                        if (cards.length > 0) {
+                            card.style.cursor = 'pointer';
+                            card.addEventListener('click', () => startStudy(chId));
+                        } else {
+                            card.style.opacity = '0.5';
+                        }
+                        grid.appendChild(card);
+                    });
+                    content.appendChild(grid);
+                    return;
+                } else if (navSection === 'superbegin') {
+                    breadcrumb.innerHTML = `<span style="color:var(--accent);cursor:pointer;" onclick="navigateTo('home')">Home</span> › Super Beginner`;
+                    const grid = document.createElement('div');
+                    grid.className = 'section-grid';
+                    const allItems = [...TEXTBOOK_STRUCTURE.superbegin.step1, ...TEXTBOOK_STRUCTURE.superbegin.step2];
+                    allItems.forEach(item => grid.appendChild(makeSubCard(item.id, item.name)));
+                    content.appendChild(grid);
+                } else {
+                    const struct = TEXTBOOK_STRUCTURE[navSection];
+                    const label = navSection === 'beginner' ? 'Beginner' : 'Intermediate';
+                    breadcrumb.innerHTML = `<span style="color:var(--accent);cursor:pointer;" onclick="navigateTo('home')">Home</span> › ${label}`;
+                    const grid = document.createElement('div');
+                    grid.className = 'section-grid';
+                    struct.chapters.forEach(ch => {
+                        const ids = ch.subsections;
+                        const p = calcProgress(ids);
+                        const card = document.createElement('div');
+                        card.className = 'chapter-card';
+                        card.innerHTML = `
+                            <div class="chapter-title">第${ch.number}課</div>
+                            <div class="chapter-subtitle">${ch.name.split('/')[0].trim()}</div>
+                            ${progressBarHTML(p)}
+                        `;
+                        card.addEventListener('click', () => navigateTo('chapter', navSection, ch.number));
+                        grid.appendChild(card);
+                    });
+                    content.appendChild(grid);
+                }
+
+            // Level 3: chapter selected — show subsections
+            } else if (navSection && navChapter) {
+                const struct = TEXTBOOK_STRUCTURE[navSection];
+                const ch = struct.chapters.find(c => c.number === navChapter);
+                const label = navSection === 'beginner' ? 'Beginner' : 'Intermediate';
+                breadcrumb.innerHTML = `
+                    <span style="color:var(--accent);cursor:pointer;" onclick="navigateTo('home')">Home</span> ›
+                    <span style="color:var(--accent);cursor:pointer;" onclick="navigateTo('section','${navSection}')">${label}</span> ›
+                    第${navChapter}課
+                `;
+                const grid = document.createElement('div');
+                grid.className = 'section-grid';
+                ch.subsections.forEach(subId => grid.appendChild(makeSubCard(subId)));
+                content.appendChild(grid);
+            }
+        }
+
+        function makeSubCard(subId, labelOverride) {
+            const cards = appState.allCards.filter(c => c.chapter === subId);
+            const prog = appState.progress[subId] || {};
+            const vals = Object.values(prog);
+            const mastered = vals.filter(p => p.state === 'mastered' || p.state === 'burned').length;
+            const studied = vals.filter(p => p.state !== 'new').length;
+            const total = cards.length;
+            const p = {
+                total, mastered, studied,
+                percent: total > 0 ? Math.round((studied / total) * 100) : 0,
+                masteredPercent: total > 0 ? Math.round((mastered / total) * 100) : 0
+            };
+            const label = labelOverride || subId;
 
             const card = document.createElement('div');
             card.className = 'chapter-card';
-            card.style.padding = '0.8rem';
-            card.style.minHeight = 'auto';
             card.innerHTML = `
-                <div class="chapter-title" style="font-size: 0.95rem;">${subsectionId}</div>
-                ${cardsInSection.length > 0 ? `
-                    <div class="chapter-subtitle" style="font-size: 0.8rem;">${cardsInSection.length}語</div>
-                    <div class="chapter-progress" style="margin: 0.4rem 0;">
-                        <div class="chapter-progress-bar" style="width: ${percent}%"></div>
-                    </div>
-                    <div class="chapter-stats" style="font-size: 0.75rem;">${mastered}/${cardsInSection.length}</div>
+                <div class="chapter-title">${label}</div>
+                ${total > 0 ? `
+                    <div class="chapter-subtitle">${total}語</div>
+                    ${progressBarHTML(p)}
                 ` : '<div class="chapter-subtitle">No data</div>'}
             `;
-
-            if (cardsInSection.length > 0) {
-                card.addEventListener('click', () => startStudy(subsectionId));
+            if (cards.length > 0) {
                 card.style.cursor = 'pointer';
+                card.addEventListener('click', () => startStudy(subId));
             }
             return card;
         }
 
-        function createChapterCard(chapter, section) {
-            const cardsInChapter = appState.cards.filter(c => c.chapter === chapter.id);
-            const progress = appState.progress[chapter.id] || {};
-            const mastered = Object.values(progress).filter(p => p.state === 'mastered' || p.state === 'burned').length;
-            const percent = cardsInChapter.length > 0 ? Math.round((mastered / cardsInChapter.length) * 100) : 0;
-
-            const card = document.createElement('div');
-            card.className = 'chapter-card';
-            card.innerHTML = `
-                <div class="chapter-title">${chapter.name}</div>
-                ${cardsInChapter.length > 0 ? `
-                    <div class="chapter-subtitle">${cardsInChapter.length} words</div>
-                    <div class="chapter-progress">
-                        <div class="chapter-progress-bar" style="width: ${percent}%"></div>
-                    </div>
-                    <div class="chapter-stats">${mastered}/${cardsInChapter.length}</div>
-                ` : '<div class="chapter-subtitle">Data coming soon</div>'}
-            `;
-
-            if (cardsInChapter.length > 0) {
-                card.addEventListener('click', () => startStudy(chapter.id));
+        function navigateTo(level, sectionKey, chapterNum) {
+            if (level === 'home') {
+                appState.navSection = null;
+                appState.navChapter = null;
+                switchView('home');
+            } else if (level === 'section') {
+                appState.navSection = sectionKey;
+                appState.navChapter = null;
+                renderListView();
+                switchView('list');
+            } else if (level === 'chapter') {
+                appState.navSection = sectionKey;
+                appState.navChapter = chapterNum;
+                renderListView();
+                switchView('list');
             }
-            return card;
         }
+
+        function renderSectionProgress() {
+            renderHome();
+            if (appState.navSection) renderListView();
+        }
+
+        function renderChapters() { renderHome(); }
+
 
         function renderDeckStats() {
             const container = document.getElementById('deck-stats');
             if (!container) return;
             container.innerHTML = '';
+
+            // 上部の統計カードを更新
+            const allProgress = Object.values(appState.progress).flatMap(ch => Object.values(ch));
+            const total = appState.allCards.length;
+            const newCount = allProgress.filter(p => p.state === 'new').length;
+            const learning = allProgress.filter(p => p.state === 'learning').length;
+            const mastered = allProgress.filter(p => p.state === 'mastered').length;
+            const burned = allProgress.filter(p => p.state === 'burned').length;
+            document.getElementById('stats-total').textContent = total;
+            document.getElementById('stats-new').textContent = newCount;
+            document.getElementById('stats-learning').textContent = learning;
+            document.getElementById('stats-mastered').textContent = mastered;
+            document.getElementById('stats-burned').textContent = burned;
 
             const CHAPTER_SECTIONS = {
                 1: ['1', '1-2', '1-3', '1-4'],
@@ -2639,14 +3000,12 @@
             renderCard();
         }
 
-        function switchView(name) {
+        function switchView(name, pushHistory = true) {
             console.log('switchView called with name:', name);
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
             const viewElement = document.getElementById(name);
-            console.log('viewElement:', viewElement, 'for name:', name);
-
             if (viewElement) {
                 viewElement.classList.add('active');
             } else {
@@ -2655,14 +3014,25 @@
             }
 
             const navBtn = document.querySelector(`[data-view="${name}"]`);
-            if (navBtn) {
-                navBtn.classList.add('active');
-            }
+            if (navBtn) navBtn.classList.add('active');
 
-            if (name === 'progress') {
-                renderDeckStats();
+            if (name === 'stats') renderDeckStats();
+            if (name === 'mywords') renderMyWords();
+
+            if (pushHistory) {
+                history.pushState({ view: name, navSection: appState.navSection, navChapter: appState.navChapter }, '', '');
             }
         }
+
+        window.addEventListener('popstate', (e) => {
+            const state = e.state || { view: 'home' };
+            appState.navSection = state.navSection || null;
+            appState.navChapter = state.navChapter || null;
+            if (state.view === 'list') {
+                renderListView();
+            }
+            switchView(state.view || 'home', false);
+        });
 
         function renderCard() {
             if (appState.cards.length === 0) return;
@@ -2672,35 +3042,85 @@
             const badges = { 'new': '🆕 New', 'learning': '📚 Learning', 'mastered': '✓ Mastered', 'burned': '🔥 Burned' };
             document.getElementById('card-badge').textContent = badges[progress.state] || '';
 
-            const chNum = parseInt(appState.currentChapter.split('-')[0]);
-            const isEarlyChapter = chNum <= 12;
-
-            // Front is always visible, back shows when flipped
             document.getElementById('card-front').classList.add('active');
             document.getElementById('card-back').classList.toggle('active', appState.isFlipped);
 
-            // Always show front (Japanese)
-            document.getElementById('card-label-front').textContent = 'Japanese / 日本語';
-            if (isEarlyChapter) {
+            if (card.isKanji) {
+                // === 漢字カード専用レンダリング ===
+                document.getElementById('card-label-front').textContent = '漢字 Kanji';
                 document.getElementById('card-jp-front').textContent = card.japanese;
-                document.getElementById('card-romaji-front').textContent = card.romaji;
+                document.getElementById('card-jp-front').style.fontSize = '4rem';
+                document.getElementById('card-romaji-front').textContent = '';
                 document.getElementById('card-en-front').textContent = '';
                 document.getElementById('card-en-front').style.display = 'none';
-            } else {
-                const text = appState.direction === 'jp-to-en' ? card.japanese : card.english;
-                const en = appState.direction === 'jp-to-en' && appState.showEn ? card.english : '';
-                document.getElementById('card-jp-front').textContent = text;
-                document.getElementById('card-romaji-front').textContent = card.romaji;
-                document.getElementById('card-en-front').textContent = en;
-                document.getElementById('card-en-front').style.display = '';
-            }
 
-            // Back shows English when flipped
-            document.getElementById('card-label-back').textContent = appState.direction === 'jp-to-en' ? 'English / 英語' : 'Japanese / 日本語';
-            const backText = appState.direction === 'jp-to-en' ? card.english : card.japanese;
-            document.getElementById('card-jp-back').textContent = backText;
-            document.getElementById('card-romaji-back').textContent = '';
-            document.getElementById('card-en-back').textContent = '';
+                document.getElementById('card-label-back').textContent = '読み方・意味';
+
+                // 主要な読みを1つずつ取り出す（・の最初のみ、カッコ除去）
+                const firstOnyomi = card.onyomi ? katakanaToHiragana(card.onyomi.split(/[・、]/)[0].trim()) : '';
+                const firstKunyomi = card.kunyomi ? card.kunyomi.split(/[・、]/)[0].trim().replace(/[（(][^）)]*[）)]/g, '') : '';
+                const mainReadings = [firstOnyomi, firstKunyomi].filter(Boolean).join('　');
+
+                document.getElementById('card-jp-back').textContent = mainReadings;
+                document.getElementById('card-jp-back').style.fontSize = '1.8rem';
+                // 英語の意味
+                document.getElementById('card-romaji-back').textContent = card.english;
+                document.getElementById('card-romaji-back').style.fontSize = '1rem';
+                document.getElementById('card-en-back').textContent = '';
+
+                const exEl = document.getElementById('card-example');
+                if (exEl) {
+                    exEl.style.display = '';
+                    let html = '';
+                    // 音読み・訓読みをすべてひらがなで表示
+                    if (card.onyomi) {
+                        const onyomiHira = katakanaToHiragana(card.onyomi);
+                        html += `<div style="margin-bottom:0.3rem;"><span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-body);">音読み</span> <span style="font-weight:600;color:var(--text);">${onyomiHira}</span></div>`;
+                    }
+                    if (card.kunyomi) html += `<div style="margin-bottom:0.6rem;"><span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-body);">訓読み</span> <span style="font-weight:600;color:var(--text);">${card.kunyomi}</span></div>`;
+                    if (card.ex1jp) html += `<div style="margin-bottom:0.15rem;color:var(--text);">・${card.ex1jp}</div>${card.ex1en ? `<div style="font-size:0.8rem;color:var(--text-muted);font-family:var(--font-body);margin-bottom:0.4rem;padding-left:0.8rem;">${card.ex1en}</div>` : ''}`;
+                    if (card.ex2jp) html += `<div style="margin-bottom:0.15rem;color:var(--text);">・${card.ex2jp}</div>${card.ex2en ? `<div style="font-size:0.8rem;color:var(--text-muted);font-family:var(--font-body);padding-left:0.8rem;">${card.ex2en}</div>` : ''}`;
+                    exEl.innerHTML = html;
+                }
+            } else {
+                // === 通常カードレンダリング ===
+                document.getElementById('card-jp-front').style.fontSize = '';
+                document.getElementById('card-jp-back').style.fontSize = '';
+
+                const chNum = parseInt(appState.currentChapter.split('-')[0]);
+                const isEarlyChapter = chNum <= 12;
+
+                document.getElementById('card-label-front').textContent = 'Japanese / 日本語';
+                if (isEarlyChapter) {
+                    document.getElementById('card-jp-front').textContent = card.japanese;
+                    document.getElementById('card-romaji-front').textContent = card.romaji;
+                    document.getElementById('card-en-front').textContent = '';
+                    document.getElementById('card-en-front').style.display = 'none';
+                } else {
+                    const text = appState.direction === 'jp-to-en' ? card.japanese : card.english;
+                    const en = appState.direction === 'jp-to-en' && appState.showEn ? card.english : '';
+                    document.getElementById('card-jp-front').textContent = text;
+                    document.getElementById('card-romaji-front').textContent = card.romaji;
+                    document.getElementById('card-en-front').textContent = en;
+                    document.getElementById('card-en-front').style.display = '';
+                }
+
+                document.getElementById('card-label-back').textContent = appState.direction === 'jp-to-en' ? 'English / 英語' : 'Japanese / 日本語';
+                const backText = appState.direction === 'jp-to-en' ? card.english : card.japanese;
+                document.getElementById('card-jp-back').textContent = backText;
+                document.getElementById('card-romaji-back').textContent = '';
+                document.getElementById('card-en-back').textContent = '';
+                const exEl = document.getElementById('card-example');
+                if (exEl) {
+                    if (card.exampleJp) {
+                        exEl.style.display = '';
+                        exEl.innerHTML = `<div style="color:var(--text);margin-bottom:0.2rem;">例文：${card.exampleJp}</div>${card.exampleEn ? `<div style="color:var(--text-muted);font-size:0.82rem;font-family:var(--font-body);">${card.exampleEn}</div>` : ''}`;
+                    } else {
+                        exEl.style.display = 'none';
+                        exEl.innerHTML = '';
+                    }
+                }
+            }
 
             const total = appState.cards.length;
             const current = appState.currentCardIndex + 1;
@@ -2856,6 +3276,203 @@
             }
             updateHeader();
             saveProgress();
+            updateStats();
+            renderSectionProgress();
+        }
+
+        function updateStats() {
+            const allProgress = Object.values(appState.progress).flatMap(ch => Object.values(ch));
+            const total = appState.allCards.length;
+            const newCount = allProgress.filter(p => p.state === 'new').length;
+            const learning = allProgress.filter(p => p.state === 'learning').length;
+            const mastered = allProgress.filter(p => p.state === 'mastered').length;
+            const burned = allProgress.filter(p => p.state === 'burned').length;
+            const el = id => document.getElementById(id);
+            if (el('stats-total')) el('stats-total').textContent = total;
+            if (el('stats-new')) el('stats-new').textContent = newCount;
+            if (el('stats-learning')) el('stats-learning').textContent = learning;
+            if (el('stats-mastered')) el('stats-mastered').textContent = mastered;
+            if (el('stats-burned')) el('stats-burned').textContent = burned;
+        }
+
+        // ========================
+        // MY WORDS / マイ単語
+        // ========================
+
+        function loadCustomWords() {
+            const saved = localStorage.getItem('jlpt_custom_words');
+            if (!saved) return;
+            appState.customWords = JSON.parse(saved);
+            appState.customWords.forEach(w => {
+                if (!appState.allCards.find(c => c.id === w.id)) {
+                    appState.allCards.push({ id: w.id, japanese: w.jp, english: w.en, romaji: w.reading, exampleJp: w.exampleJp || '', exampleEn: w.exampleEn || '', chapter: 'custom' });
+                }
+                if (!appState.progress['custom']) appState.progress['custom'] = {};
+                if (!appState.progress['custom'][w.id]) {
+                    appState.progress['custom'][w.id] = { state: 'new', correct: 0, again: 0 };
+                }
+            });
+        }
+
+        function saveCustomWords() {
+            localStorage.setItem('jlpt_custom_words', JSON.stringify(appState.customWords));
+        }
+
+        function findChaptersForWord(jp, reading) {
+            const found = new Map();
+            appState.allCards.forEach(c => {
+                if (c.chapter === 'custom') return;
+                if (c.japanese === jp || c.japanese === reading ||
+                    (reading && c.romaji === reading)) {
+                    found.set(c.chapter, true);
+                }
+            });
+            return [...found.keys()];
+        }
+
+
+        function deleteCustomWord(id) {
+            appState.customWords = appState.customWords.filter(w => w.id !== id);
+            appState.allCards = appState.allCards.filter(c => c.id !== id);
+            if (appState.progress['custom']) delete appState.progress['custom'][id];
+            saveCustomWords();
+            saveProgress();
+            renderMyWords();
+        }
+
+        const IMPORT_PROMPT = `以下の日本語の単語リストについて、それぞれCSV形式（カンマ区切り）で出力してください。
+ヘッダー行は不要です。説明も不要です。出力のみでお願いします。
+
+フォーマット（1行1単語）：
+単語,ひらがな読み,ローマ字,英語の意味（短く）,日本語の例文（20文字以内）,例文の英訳
+
+単語リスト：
+（ここに単語を入力してください）
+
+出力例：
+食べる,たべる,taberu,to eat,ご飯を食べます。,I eat rice.
+学校,がっこう,gakkou,school,学校に行きます。,I go to school.
+きれい,きれい,kirei,beautiful / clean,花がきれいです。,The flowers are beautiful.`;
+
+        function importBulkWords() {
+            const raw = document.getElementById('mw-import-text').value.trim();
+            const status = document.getElementById('mw-import-status');
+            if (!raw) { status.textContent = '⚠️ テキストを貼り付けてください'; return; }
+
+            const lines = raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//') && !l.startsWith('#'));
+            let added = 0, skipped = 0;
+
+            lines.forEach(line => {
+                // カンマまたはタブで分割
+                const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+                if (parts.length < 2) { skipped++; return; }
+
+                const jp      = parts[0]?.trim() || '';
+                const reading = parts[1]?.trim() || '';
+                const romaji  = parts[2]?.trim() || '';
+                const en      = parts[3]?.trim() || '';
+                const exJp    = parts[4]?.trim() || '';
+                const exEn    = parts[5]?.trim() || '';
+
+                if (!jp) { skipped++; return; }
+
+                const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+                const chapters = findChaptersForWord(jp, reading);
+                const word = { id, jp, reading: reading || romaji, en, exampleJp: exJp, exampleEn: exEn, chapters };
+
+                appState.customWords.push(word);
+                appState.allCards.push({ id, japanese: jp, english: en, romaji: reading || romaji, exampleJp: exJp, exampleEn: exEn, chapter: 'custom' });
+                if (!appState.progress['custom']) appState.progress['custom'] = {};
+                appState.progress['custom'][id] = { state: 'new', correct: 0, again: 0 };
+                added++;
+            });
+
+            if (added > 0) {
+                saveCustomWords();
+                saveProgress();
+                document.getElementById('mw-import-text').value = '';
+                status.textContent = `✓ ${added}語を追加しました！${skipped > 0 ? `（${skipped}行スキップ）` : ''}`;
+                renderMyWords();
+            } else {
+                status.textContent = `⚠️ インポートできませんでした（フォーマットを確認してください）`;
+            }
+        }
+
+        function renderMyWords() {
+            const list = document.getElementById('mw-list');
+            const header = document.getElementById('mw-list-header');
+            const toggleBtn = document.getElementById('mw-lang-toggle');
+            const studySection = document.getElementById('mw-study-section');
+            const countEl = document.getElementById('mw-count');
+            const barWrap = document.getElementById('mw-progress-bar-wrap');
+            if (!list) return;
+
+            const words = appState.customWords;
+            const prog = appState.progress['custom'] || {};
+            const isEN = appState.mwLangMode === 'en';
+
+            countEl.textContent = words.length;
+            studySection.style.display = words.length > 0 ? 'block' : 'none';
+            header.style.display = words.length > 0 ? 'flex' : 'none';
+            if (toggleBtn) toggleBtn.textContent = isEN ? '🇺🇸 EN' : '🇯🇵 JP';
+
+            if (words.length > 0 && barWrap) {
+                barWrap.innerHTML = progressBarHTML(calcProgress(['custom']));
+            }
+
+            list.innerHTML = '';
+            if (words.length === 0) {
+                list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2.5rem 1rem;font-family:var(--font-jp);line-height:2;">まだ単語がありません<br><small style="font-size:0.85rem;">プロンプトをコピーしてAIに貼り付けてください</small></div>`;
+                return;
+            }
+
+            const stateColors = { new: '#94a3b8', learning: '#f59e0b', mastered: '#22c55e', burned: '#3b82f6' };
+            const stateLabels = { new: '新規', learning: '学習中', mastered: '習得', burned: '完成' };
+
+            [...words].reverse().forEach(w => {
+                const state = (prog[w.id] || {}).state || 'new';
+                const chip = `<span style="font-size:0.72rem;padding:0.1rem 0.4rem;border-radius:4px;background:${stateColors[state]}22;color:${stateColors[state]};font-weight:700;">${stateLabels[state]}</span>`;
+                const chapterChips = (w.chapters || []).map(ch => {
+                    const display = ch.includes('-') ? `第${ch.split('-')[0]}課-${ch.split('-')[1]}` : `第${ch}課`;
+                    return `<span style="font-size:0.7rem;background:var(--accent-soft);color:var(--accent-dark);border-radius:4px;padding:0.1rem 0.45rem;font-weight:700;">${display}</span>`;
+                }).join('');
+
+                const div = document.createElement('div');
+                div.className = 'chapter-card';
+                div.style.cssText = 'display:flex;align-items:center;gap:0.8rem;padding:0.85rem 1rem;margin-bottom:0.5rem;';
+
+                if (isEN) {
+                    // English mode: EN meaning big, JP small below
+                    div.innerHTML = `
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;">
+                                <span style="font-size:1.1rem;font-weight:700;">${w.en}</span>
+                                ${chip}
+                            </div>
+                            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.15rem;font-family:var(--font-jp);">${w.jp}${w.reading && w.reading !== w.jp ? `　${w.reading}` : ''}</div>
+                            ${w.exampleEn ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;font-style:italic;">ex) ${w.exampleEn}</div>` : ''}
+                            ${chapterChips ? `<div style="margin-top:0.35rem;display:flex;gap:0.3rem;flex-wrap:wrap;">${chapterChips}</div>` : ''}
+                        </div>
+                        <button onclick="deleteCustomWord('${w.id}')" style="flex-shrink:0;background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.5rem;line-height:1;">✕</button>
+                    `;
+                } else {
+                    // Japanese mode: JP word big, EN small below
+                    div.innerHTML = `
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap;">
+                                <span style="font-family:var(--font-jp);font-size:1.1rem;font-weight:700;">${w.jp}</span>
+                                ${w.reading && w.reading !== w.jp ? `<span style="font-size:0.8rem;color:var(--text-muted);">${w.reading}</span>` : ''}
+                                ${chip}
+                            </div>
+                            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.15rem;">${w.en}</div>
+                            ${w.exampleJp ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;font-style:italic;font-family:var(--font-jp);">例）${w.exampleJp}</div>` : ''}
+                            ${chapterChips ? `<div style="margin-top:0.35rem;display:flex;gap:0.3rem;flex-wrap:wrap;">${chapterChips}</div>` : ''}
+                        </div>
+                        <button onclick="deleteCustomWord('${w.id}')" style="flex-shrink:0;background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:0.3rem 0.5rem;line-height:1;">✕</button>
+                    `;
+                }
+                list.appendChild(div);
+            });
         }
 
         function renderQuiz() {
@@ -2867,24 +3484,38 @@
 
             if (appState.cards.length === 0) return;
             const card = appState.cards[appState.currentCardIndex];
-            const isJpQuestion = appState.direction === 'jp-to-en';
-            const question = isJpQuestion ? card.japanese : card.english;
 
-            document.getElementById('quiz-question').textContent = question;
+            // 英語ヒントは答え合わせ後に表示するので、ここでは非表示
+            const enEl = document.getElementById('quiz-en');
+            if (enEl) enEl.style.display = 'none';
 
-            // Generate 4 choices: 1 correct + 3 wrong
+            // ローマ字表示（オフ）
+            const romajiEl = document.getElementById('quiz-romaji');
+            romajiEl.style.display = 'none';
+
+            // 問題文: 学ぶ、雨 など意味が成立する形で表示
+            const quizItem = getKanjiQuizItem(card);
+            document.getElementById('quiz-question').textContent = quizItem.question;
+            const correctReading = quizItem.reading;
+
+            // 選択肢：ひらがな読みを4つ表示
             const allCards = appState.cards;
-            const wrongChoices = allCards.filter(c => c.id !== card.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const wrongChoices = allCards
+                .filter(c => c.id !== card.id)
+                .filter(c => getKanjiQuizItem(c).reading !== correctReading)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
             const choices = [card, ...wrongChoices].sort(() => Math.random() - 0.5);
 
             const choicesDiv = document.getElementById('quiz-choices');
             choicesDiv.innerHTML = '';
-            choices.forEach((choice, idx) => {
-                const answer = isJpQuestion ? choice.english : choice.japanese;
+            choices.forEach((choice) => {
+                const reading = getKanjiQuizItem(choice).reading;
                 const btn = document.createElement('button');
-                btn.className = 'btn btn-primary';
-                btn.textContent = answer;
-                btn.addEventListener('click', () => checkQuizAnswer(choice.id === card.id, card.id));
+                btn.className = 'btn btn-secondary';
+                btn.style.cssText = 'font-family:var(--font-jp);font-size:1.05rem;font-weight:700;padding:0.9rem 0.5rem;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--text);transition:all 0.15s;';
+                btn.textContent = reading;
+                btn.addEventListener('click', () => checkQuizAnswer(choice.id === card.id, card.id, btn, correctReading));
                 choicesDiv.appendChild(btn);
             });
 
@@ -2896,23 +3527,50 @@
             document.getElementById('session-progress-text').textContent = prog + '%';
         }
 
-        function checkQuizAnswer(isCorrect, cardId) {
+        function checkQuizAnswer(isCorrect, cardId, clickedBtn, correctReading) {
+            // ボタンのハイライト
+            if (isCorrect) {
+                clickedBtn.style.background = 'var(--ok)';
+                clickedBtn.style.color = '#fff';
+                clickedBtn.style.borderColor = 'var(--ok)';
+            } else {
+                clickedBtn.style.background = 'var(--wrong)';
+                clickedBtn.style.color = '#fff';
+                clickedBtn.style.borderColor = 'var(--wrong)';
+                // 正解ボタンを緑に
+                document.querySelectorAll('#quiz-choices button').forEach(b => {
+                    if (b.textContent === correctReading) {
+                        b.style.background = 'var(--ok)';
+                        b.style.color = '#fff';
+                        b.style.borderColor = 'var(--ok)';
+                    }
+                });
+            }
+            // 全ボタン無効化
+            document.querySelectorAll('#quiz-choices button').forEach(b => b.disabled = true);
+
             const feedbackDiv = document.getElementById('quiz-feedback');
             const feedbackText = document.getElementById('feedback-text');
-
             if (isCorrect) {
-                feedbackText.textContent = '✓ Correct! / 正解';
+                feedbackText.textContent = '✓ 正解！';
                 feedbackText.style.color = 'var(--ok)';
                 updateCardState(cardId, 'good');
                 playPingPong();
             } else {
-                feedbackText.textContent = '✗ Incorrect / 不正解';
+                feedbackText.textContent = '✗ 不正解';
                 feedbackText.style.color = 'var(--wrong)';
                 updateCardState(cardId, 'again');
             }
 
+            // 答え合わせ後に英語の意味を表示
+            const card = appState.cards[appState.currentCardIndex];
+            const enEl = document.getElementById('quiz-en');
+            if (enEl && card && card.english) {
+                enEl.textContent = '意味：' + card.english;
+                enEl.style.display = 'block';
+            }
+
             feedbackDiv.style.display = 'block';
-            document.getElementById('quiz-choices').style.display = 'none';
         }
 
         function playPingPong() {
@@ -2961,8 +3619,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadProgress();
             initCards();
+            loadCustomWords();
             renderChapters();
             updateHeader();
+            updateStats();
+            history.replaceState({ view: 'home', navSection: null, navChapter: null }, '', '');
+
+            document.getElementById('mw-copy-prompt-btn').addEventListener('click', () => {
+                navigator.clipboard.writeText(IMPORT_PROMPT).then(() => {
+                    const btn = document.getElementById('mw-copy-prompt-btn');
+                    btn.textContent = '✓ コピーしました！';
+                    setTimeout(() => { btn.textContent = '📄 AIプロンプトをコピー'; }, 2000);
+                });
+            });
+            document.getElementById('mw-import-btn').addEventListener('click', importBulkWords);
+            document.getElementById('mw-study-btn').addEventListener('click', () => startStudy('custom'));
+            document.getElementById('mw-lang-toggle').addEventListener('click', () => {
+                appState.mwLangMode = appState.mwLangMode === 'jp' ? 'en' : 'jp';
+                renderMyWords();
+            });
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', () => switchView(btn.dataset.view));
@@ -3104,6 +3779,39 @@
                     renderCard();
                 } else {
                     renderQuiz();
+                }
+            });
+
+            // ローマ字トグルボタン
+            const romajiBtn = document.getElementById('btn-toggle-romaji');
+            const savedRomaji = localStorage.getItem('jlpt_showRomaji');
+            if (savedRomaji === 'true') {
+                appState.showRomaji = true;
+                romajiBtn.style.background = 'var(--accent)';
+                romajiBtn.style.color = '#fff';
+            }
+            romajiBtn.addEventListener('click', () => {
+                appState.showRomaji = !appState.showRomaji;
+                romajiBtn.style.background = appState.showRomaji ? 'var(--accent)' : 'transparent';
+                romajiBtn.style.color = appState.showRomaji ? '#fff' : 'var(--accent)';
+                localStorage.setItem('jlpt_showRomaji', appState.showRomaji);
+                renderQuiz();
+            });
+
+            // Gemini APIキー保存
+            const savedKey = localStorage.getItem('jlpt_gemini_key');
+            if (savedKey) {
+                document.getElementById('setting-gemini-key').value = savedKey;
+                document.getElementById('gemini-key-status').textContent = '✓ APIキーが保存されています';
+            }
+            document.getElementById('btn-save-gemini-key').addEventListener('click', () => {
+                const key = document.getElementById('setting-gemini-key').value.trim();
+                if (key) {
+                    localStorage.setItem('jlpt_gemini_key', key);
+                    document.getElementById('gemini-key-status').textContent = '✓ 保存しました！';
+                } else {
+                    localStorage.removeItem('jlpt_gemini_key');
+                    document.getElementById('gemini-key-status').textContent = 'キーを削除しました';
                 }
             });
 
